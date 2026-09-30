@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Luxury Deep Espresso Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#362925" />
+      <stop offset="50%" stop-color="#281E1C" />
+      <stop offset="100%" stop-color="#1A1312" />
+    </linearGradient>
+
+    <!-- Warm Champagne Gold Gradient for Élora Monogram -->
+    <linearGradient id="goldGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#FBF2DE" />
+      <stop offset="35%" stop-color="#E8D5B0" />
+      <stop offset="70%" stop-color="#CBB07E" />
+      <stop offset="100%" stop-color="#AF9158" />
+    </linearGradient>
+
+    <!-- Hairline Gold Rim Gradient -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBF2DE" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#CBB07E" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#8C6D62" stop-opacity="0.2" />
+    </linearGradient>
+
+    <!-- Subtle Depth Shadow -->
+    <filter id="monogramShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000000" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Luxury Squircle / Rounded Tile -->
+  <rect x="18" y="18" width="476" height="476" rx="124" ry="124" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="7" />
+
+  <!-- Botanical É Monogram (Centered & Scaled) -->
+  <g transform="translate(74.83, 16.17) scale(3.088)" filter="url(#monogramShadow)">
+    <!-- Leaf Accent -->
+    <path
+      d="M 79.33 21.00 L 78.67 21.00 L 72.33 24.00 L 70.67 24.33 L 70.00 25.00 L 67.33 26.00 L 66.33 27.00 L 62.33 29.33 L 56.67 34.67 L 52.00 41.67 L 51.33 43.00 L 51.33 44.00 L 54.33 41.33 L 57.67 39.33 L 69.00 36.33 L 73.00 34.00 L 74.33 32.33 L 76.00 31.00 L 79.00 25.00 L 79.33 22.33 L 79.67 22.00 Z"
+      fill="url(#goldGrad)"
+    />
+    <!-- Letter É Body -->
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M 32.67 101.33 L 33.33 101.00 L 35.00 99.00 L 36.33 96.67 L 38.00 95.33 L 42.33 90.67 L 42.33 53.33 L 42.67 52.33 L 43.33 51.67 L 44.33 51.33 L 63.67 51.33 L 68.00 51.67 L 71.33 52.67 L 75.67 54.67 L 77.67 56.33 L 79.00 57.00 L 80.67 58.67 L 81.00 59.67 L 83.00 62.33 L 84.33 66.33 L 84.67 64.67 L 84.00 63.33 L 83.33 58.33 L 82.67 57.00 L 82.33 52.67 L 81.67 51.00 L 44.67 51.00 L 28.33 50.67 L 28.00 51.00 L 27.00 51.00 L 27.67 51.67 L 29.00 52.00 L 30.33 53.33 L 31.33 55.33 L 32.33 59.33 Z M 77.00 78.67 L 75.67 79.00 L 73.67 80.33 L 71.33 81.33 L 68.00 82.33 L 66.67 82.33 L 64.67 83.33 L 63.33 83.33 L 61.33 84.33 L 57.33 85.33 L 54.67 87.00 L 51.67 88.00 L 45.67 91.67 L 43.00 93.67 L 38.67 97.67 L 36.33 100.33 L 35.00 103.00 L 33.67 104.67 L 31.33 111.33 L 30.67 116.33 L 31.00 126.33 L 30.33 128.67 L 30.33 130.33 L 28.00 133.00 L 26.33 134.00 L 24.67 134.33 L 84.00 134.33 L 84.67 133.67 L 84.67 133.00 L 85.33 132.33 L 86.00 130.33 L 86.33 128.33 L 87.67 126.00 L 88.67 122.33 L 90.67 118.33 L 90.67 117.33 L 91.67 116.00 L 91.67 115.00 L 92.67 113.33 L 92.67 112.33 L 92.00 112.33 L 92.00 113.33 L 91.00 114.33 L 90.00 116.67 L 86.33 122.00 L 84.33 123.67 L 82.00 126.33 L 80.67 127.00 L 80.00 128.00 L 79.00 128.67 L 77.67 129.00 L 74.33 131.00 L 71.67 132.00 L 67.33 133.00 L 64.67 133.00 L 61.00 134.00 L 55.67 134.00 L 47.67 133.00 L 46.00 132.33 L 44.33 131.00 L 42.33 127.00 L 42.33 97.33 L 43.67 96.00 L 48.67 93.00 L 57.67 90.33 L 64.00 89.33 L 70.67 86.67 L 73.00 85.00 L 76.33 81.33 L 77.00 80.00 Z"
+      fill="url(#goldGrad)"
+    />
+  </g>
+</svg>
