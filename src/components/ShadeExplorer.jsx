@@ -1,44 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Check } from 'lucide-react';
-
-export const ELORA_SHADES = [
-  {
-    id: 'opal-glaze',
-    name: 'Opal Glaze (01)',
-    description: 'Translucent dewy pearl with sheer iridescent reflection',
-    hex: '#E3CFD2',
-    gradient: 'radial-gradient(circle at 35% 35%, #F7EDEF 0%, #E3CFD2 55%, #CFB7BB 100%)',
-    undertone: 'Cool Dewy Translucent',
-  },
-  {
-    id: 'rose-glace',
-    name: 'Rosé Glacé (02)',
-    description: 'Delicate crushed petal dew with luminous rose gold sheen',
-    hex: '#E1B2A7',
-    gradient: 'radial-gradient(circle at 35% 35%, #F3CECA 0%, #E1B2A7 55%, #C8998E 100%)',
-    undertone: 'Neutral Peachy Rosé',
-  },
-  {
-    id: 'miel-dore',
-    name: 'Miel Doré (03)',
-    description: 'Sunlit warm amber with rich golden honey glaze undertones',
-    hex: '#AA765B',
-    gradient: 'radial-gradient(circle at 35% 35%, #C7957A 0%, #AA765B 55%, #8B593F 100%)',
-    undertone: 'Warm Golden Bronze',
-  },
-  {
-    id: 'cacao-glace',
-    name: 'Cacao Glacé (04)',
-    description: 'Deep toasted espresso ganache with rich velvety warmth',
-    hex: '#67311E',
-    gradient: 'radial-gradient(circle at 35% 35%, #8C4D35 0%, #67311E 55%, #4A1E11 100%)',
-    undertone: 'Deep Espresso Berry',
-  },
-];
+import { Check, ArrowRight } from 'lucide-react';
+import { ELORA_SHADES } from '../data/shades';
+import ShadeDetailView from './ShadeDetailView';
 
 export default function ShadeExplorer({ onAddToCart, onSelectShade, buttonText = "Shades" }) {
   const [isShadeModalOpen, setIsShadeModalOpen] = useState(false);
   const [selectedShade, setSelectedShade] = useState(ELORA_SHADES[1]); // Default to Rosé Glacé (02) matching reference
+  const [isShadePdpOpen, setIsShadePdpOpen] = useState(false);
   const [added, setAdded] = useState(false);
 
   // Close on Escape key
@@ -229,6 +197,31 @@ export default function ShadeExplorer({ onAddToCart, onSelectShade, buttonText =
                 )}
               </button>
 
+              <button
+                type="button"
+                onClick={() => setIsShadePdpOpen(true)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#7D4F44',
+                  fontSize: '0.68rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.15em',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '4px 8px',
+                  marginTop: '4px',
+                  transition: 'opacity 0.2s ease',
+                }}
+                className="hover:opacity-75"
+              >
+                <span>View Full {selectedShade.name} Page</span>
+                <ArrowRight size={12} />
+              </button>
+
               <span className="text-[10px] text-[#3A2E2B]/50 tracking-wider uppercase mt-1">
                 Complimentary Privé Shipping Included
               </span>
@@ -236,6 +229,14 @@ export default function ShadeExplorer({ onAddToCart, onSelectShade, buttonText =
           </div>
         </div>
       )}
+
+      {/* Dedicated Shade Full-Screen Product Detail Page */}
+      <ShadeDetailView
+        isOpen={isShadePdpOpen}
+        initialShade={selectedShade}
+        onClose={() => setIsShadePdpOpen(false)}
+        onAddToCart={onAddToCart}
+      />
     </>
   );
 }

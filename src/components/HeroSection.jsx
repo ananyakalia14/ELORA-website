@@ -15,11 +15,9 @@ export default function HeroSection({ onShopHero }) {
           ========================================================================== */}
       <div className="elora-hero-media-wrap">
         <picture className="elora-hero-picture">
-          <source media="(max-width: 768px)" srcSet="/images/glazing-milk-martini-mobile.jpg" />
-          <source media="(max-width: 1024px)" srcSet="/images/glazing-milk-martini-tablet.jpg" />
           <img
-            src="/images/glazing-milk-martini.jpg"
-            alt="Élora Glazing Milk Campaign"
+            src="/images/hero-model.jpg"
+            alt="Élora Skin & Beauty — The Glazed Barrier Elixir"
             className="elora-hero-image"
             loading="eager"
             fetchPriority="high"

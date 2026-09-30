@@ -6,6 +6,7 @@ import HeroSection from './components/HeroSection';
 import ProductSection from './components/ProductSection';
 import ProductModal from './components/ProductModal';
 import GlazingMilkDetailView from './components/GlazingMilkDetailView';
+import ShadeDetailView from './components/ShadeDetailView';
 import PhilosophySection from './components/PhilosophySection';
 import ValuesSection from './components/ValuesSection';
 import PressSection from './components/PressSection';
@@ -33,6 +34,8 @@ export default function App() {
   // Modal quick view state
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [glazingMilkViewOpen, setGlazingMilkViewOpen] = useState(false);
+  const [shadeViewOpen, setShadeViewOpen] = useState(false);
+  const [selectedShadeForView, setSelectedShadeForView] = useState(null);
 
   const handleOpenProduct = (product) => {
     if (!product) return;
@@ -43,8 +46,16 @@ export default function App() {
       (product.name && product.name.toLowerCase().includes('glazing')) ||
       (product.name && product.name.toLowerCase().includes('milk'));
 
+    const isLipTint =
+      product.id === 'brume' ||
+      (product.name && product.name.toLowerCase().includes('tint')) ||
+      (product.name && product.name.toLowerCase().includes('shade'));
+
     if (isGlazingMilk) {
       setGlazingMilkViewOpen(true);
+    } else if (isLipTint) {
+      setSelectedShadeForView(null);
+      setShadeViewOpen(true);
     } else {
       setSelectedProduct(product);
     }
@@ -184,6 +195,19 @@ export default function App() {
         onAddToCart={handleAddToCart}
         onOpenCart={() => {
           setGlazingMilkViewOpen(false);
+          setCartOpen(true);
+        }}
+        cartCount={totalCartCount}
+      />
+
+      {/* Full-Screen Shade Product Detail View */}
+      <ShadeDetailView
+        isOpen={shadeViewOpen}
+        initialShade={selectedShadeForView}
+        onClose={() => setShadeViewOpen(false)}
+        onAddToCart={handleAddToCart}
+        onOpenCart={() => {
+          setShadeViewOpen(false);
           setCartOpen(true);
         }}
         cartCount={totalCartCount}

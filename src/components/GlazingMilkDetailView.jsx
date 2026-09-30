@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, Star, Check, Sparkles, ShieldCheck, Heart, Minus, Plus } from 'lucide-react';
+import ShadeDetailView from './ShadeDetailView';
+import { ELORA_SHADES } from '../data/shades';
 
 /**
  * Full-Screen Product Detail View for Élora Glazing Milk Essence
  * 
  * Container skeleton strictly locked to user specifications:
- * - Full-bleed background visual: /images/glazing-milk-martini.jpg
+ * - Full-bleed background visual: /images/glazing-milk-martini.png
  * - Soft editorial gradient scrim
  * - Overlaid Header: ← BACK TO SHOP, centered élora wordmark, BAG (count)
  * - Pinned Right Buy Card: Floating frosted glass card with Eyebrow, Title, Rating, Price, CTA, Accordions
@@ -20,6 +22,9 @@ export default function GlazingMilkDetailView({
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [openAccordion, setOpenAccordion] = useState('ritual'); // 'ritual' open by default
+  const [selectedShade, setSelectedShade] = useState(ELORA_SHADES[1]); // Default to Rosé Glacé (02)
+  const [hoveredShade, setHoveredShade] = useState(null);
+  const [isShadePdpOpen, setIsShadePdpOpen] = useState(false);
 
   // Lock body scroll and listen for Escape key
   useEffect(() => {
@@ -54,7 +59,7 @@ export default function GlazingMilkDetailView({
     formattedPrice: '$115.00',
     rating: 5.0,
     reviews: 189,
-    image: '/images/glazing-milk-martini.jpg',
+    image: '/images/glazing-milk-martini.png',
     description:
       'A nutrient-dense, micro-emulsified ceramide facial essence formulated to drench skin in barrier-strengthening dew for an immediate glazed, glass-skin gleam.',
   };
@@ -114,15 +119,16 @@ export default function GlazingMilkDetailView({
       >
         <source media="(max-width: 768px)" srcSet="/images/glazing-milk-martini-mobile.jpg" />
         <source media="(max-width: 1024px)" srcSet="/images/glazing-milk-martini-tablet.jpg" />
+        <source type="image/png" srcSet="/images/glazing-milk-martini.png" />
         <img
-          src="/images/glazing-milk-martini.jpg"
+          src="/images/glazing-milk-martini.png"
           alt="Élora Glazing Milk"
-          className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none z-0"
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0"
           style={{
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            objectPosition: 'center center',
+            objectPosition: '30% center',
             imageRendering: 'auto',
             pointerEvents: 'none',
           }}
@@ -364,11 +370,145 @@ export default function GlazingMilkDetailView({
               fontSize: '0.86rem',
               lineHeight: 1.6,
               color: '#52433E',
-              margin: '0 0 1.35rem 0',
+              margin: '0 0 1.25rem 0',
             }}
           >
             {productData.description}
           </p>
+
+          {/* 4 Shade Swatches in Button Format (Each opens dedicated Shade Product Page) */}
+          <div
+            style={{
+              marginBottom: '1.4rem',
+              padding: '12px 16px',
+              borderRadius: '22px',
+              backgroundColor: 'rgba(255, 255, 255, 0.65)',
+              border: '1px solid rgba(170, 119, 106, 0.22)',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '0.75rem',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: '0.66rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.18em',
+                  fontWeight: 600,
+                  color: '#AA776A',
+                  display: 'block',
+                }}
+              >
+                THE 4 ÉLORA GLAZES
+              </span>
+              <span
+                style={{
+                  fontSize: '0.74rem',
+                  color: '#3A2E2B',
+                  fontWeight: 600,
+                  letterSpacing: '0.03em',
+                }}
+              >
+                {(hoveredShade || selectedShade).name}
+              </span>
+            </div>
+
+            {/* 4 Circular Swatch Buttons matching reference image */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '8px',
+              }}
+            >
+              {ELORA_SHADES.map((shade) => {
+                const isSelected = selectedShade.id === shade.id;
+                return (
+                  <button
+                    key={shade.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedShade(shade);
+                      setIsShadePdpOpen(true);
+                    }}
+                    onMouseEnter={() => setHoveredShade(shade)}
+                    onMouseLeave={() => setHoveredShade(null)}
+                    title={`Open ${shade.name} Product Page`}
+                    aria-label={`Open ${shade.name} Product Page`}
+                    style={{
+                      background: 'none',
+                      border: isSelected ? '1.5px solid #3A2E2B' : '1.5px solid transparent',
+                      borderRadius: '999px',
+                      padding: '4px',
+                      cursor: 'pointer',
+                      transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
+                      transform: isSelected ? 'scale(1.08)' : 'scale(1)',
+                      boxShadow: isSelected ? '0 4px 12px rgba(58, 46, 43, 0.18)' : 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '999px',
+                        backgroundColor: shade.hex,
+                        background: shade.gradient,
+                        boxShadow:
+                          'inset 2px 2px 4px rgba(255, 255, 255, 0.55), inset -2px -2px 4px rgba(0, 0, 0, 0.25), 0 3px 8px rgba(0,0,0,0.12)',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        transition: 'transform 0.2s ease',
+                      }}
+                      className="elora-swatch-circle elora-swatch-drop"
+                    >
+                      {/* Specular curved droplet reflection */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '6px',
+                          right: '8px',
+                          width: '9px',
+                          height: '5px',
+                          borderRadius: '999px',
+                          backgroundColor: 'rgba(255, 255, 255, 0.75)',
+                          transform: 'rotate(-28deg)',
+                          filter: 'blur(0.35px)',
+                          pointerEvents: 'none',
+                        }}
+                      />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <div
+              style={{
+                marginTop: '0.45rem',
+                textAlign: 'center',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: '0.62rem',
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: '#8A736C',
+                  fontWeight: 500,
+                }}
+              >
+                Click shade to view dedicated product page
+              </span>
+            </div>
+          </div>
 
           {/* Quantity Selector + Add To Bag Button */}
           <div
@@ -606,7 +746,7 @@ export default function GlazingMilkDetailView({
             </div>
 
             {/* Accordion 3: Clinical Performance */}
-            <div style={{ borderBottom: '1px solid rgba(170, 119, 106, 0.15)' }}>
+            <div>
               <button
                 type="button"
                 onClick={() => toggleAccordion('clinicals')}
@@ -661,61 +801,19 @@ export default function GlazingMilkDetailView({
                 </div>
               )}
             </div>
-
-            {/* Accordion 4: Purity & Shipping */}
-            <div>
-              <button
-                type="button"
-                onClick={() => toggleAccordion('shipping')}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '0.85rem 0',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
-                aria-expanded={openAccordion === 'shipping'}
-              >
-                <span
-                  style={{
-                    fontSize: '0.72rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.15em',
-                    fontWeight: 600,
-                    color: '#3A2E2B',
-                  }}
-                >
-                  Purity &amp; Privé Delivery
-                </span>
-                <ChevronDown
-                  size={15}
-                  color="#AA776A"
-                  style={{
-                    transform: openAccordion === 'shipping' ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.25s ease',
-                  }}
-                />
-              </button>
-              {openAccordion === 'shipping' && (
-                <div
-                  style={{
-                    padding: '0 0 0.95rem 0',
-                    fontSize: '0.81rem',
-                    lineHeight: 1.6,
-                    color: '#5E4F49',
-                  }}
-                >
-                  Vegan, cruelty-free, fragrance-free, non-comedogenic. Formulated in Grasse, France. Complimentary 2-day climate-conscious shipping &amp; signature gift box on all boutique orders.
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
+
+      {/* Dedicated Full-Screen Shade Product Detail Page */}
+      <ShadeDetailView
+        isOpen={isShadePdpOpen}
+        initialShade={selectedShade}
+        onClose={() => setIsShadePdpOpen(false)}
+        onAddToCart={onAddToCart}
+        onOpenCart={onOpenCart}
+        cartCount={cartCount}
+      />
     </div>
   );
 }

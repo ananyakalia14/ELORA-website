@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Check, Star, Sparkles, Droplet } from 'lucide-react';
 import GlazingMilkDetailView from './GlazingMilkDetailView';
+import ShadeExplorer from './ShadeExplorer';
 
 export default function ProductModal({ product, onClose, onAddToCart }) {
   const [quantity, setQuantity] = useState(1);
@@ -199,6 +200,30 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
               ))}
             </div>
           )}
+
+          {/* Shade Explorer Option */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '1.25rem',
+              padding: '10px 16px',
+              borderRadius: '18px',
+              backgroundColor: '#F9F6F0',
+              border: '1px solid var(--color-border)',
+            }}
+          >
+            <div>
+              <span style={{ fontSize: '0.66rem', textTransform: 'uppercase', letterSpacing: '0.14em', fontWeight: 600, color: '#AA776A', display: 'block' }}>
+                AVAILABLE SHADES
+              </span>
+              <span style={{ fontSize: '0.78rem', color: '#3A2E2B', fontWeight: 500 }}>
+                Explore 4 Glaze Swatches
+              </span>
+            </div>
+            <ShadeExplorer onAddToCart={onAddToCart} buttonText="Shades" />
+          </div>
 
           {/* Add to Bag Row */}
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginTop: 'auto' }}>
