@@ -40,7 +40,7 @@ export const DEFAULT_CAROUSEL_PRODUCTS = [
     rating: 4.9,
     reviews: 89,
     primaryImage: "/images/products/elixir-packshot.jpg",
-    hoverImage: "/images/teddytoast.png"
+    hoverImage: "/images/products/elixir-hover.png"
   },
   {
     id: "hero-serum",

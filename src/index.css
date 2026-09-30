@@ -1096,21 +1096,23 @@ h1, h2, h3, h4, .font-serif {
 .elora-image-primary {
   opacity: 1;
   z-index: 1;
-  transition: opacity 320ms ease-in-out, transform 0.6s var(--ease-smooth);
+  transition: transform 0.6s var(--ease-smooth);
 }
 
 .elora-image-hover {
   opacity: 0;
   z-index: 2;
-  transition: opacity 320ms ease-in-out, transform 0.6s var(--ease-smooth);
+  pointer-events: none;
+  transition: opacity 350ms cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s var(--ease-smooth);
 }
 
-.elora-carousel-card:hover .elora-image-primary {
-  opacity: 0;
+.elora-carousel-card:hover .elora-image-primary,
+.elora-carousel-card:focus-within .elora-image-primary {
   transform: scale(1.04);
 }
 
-.elora-carousel-card:hover .elora-image-hover {
+.elora-carousel-card:hover .elora-image-hover,
+.elora-carousel-card:focus-within .elora-image-hover {
   opacity: 1;
   transform: scale(1.04);
 }

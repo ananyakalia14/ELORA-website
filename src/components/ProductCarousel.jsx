@@ -135,9 +135,9 @@ export default function ProductCarousel({
               {/* SECONDARY TEXTURE/LIFESTYLE IMAGE (Cross-fades in on hover) */}
               <img
                 src={item.hoverImage}
-                alt={`${item.name} application texture`}
+                alt={`${item.name} editorial campaign`}
                 className="elora-image-hover"
-                loading="lazy"
+                loading="eager"
               />
 
               {/* Soft Editorial Scrims right over the photo */}
