@@ -1,7 +1,6 @@
 import React from 'react';
 import ProductCarousel from './ProductCarousel';
 import ExplodedGlazingMilkVideo from './GlazingMilkExploded';
-import ShadeExplorer from './ShadeExplorer';
 import { DEFAULT_CAROUSEL_PRODUCTS } from '../data/carouselProducts';
 
 /**
@@ -71,21 +70,7 @@ export default function ProductSection({ onAddToCart, onQuickView }) {
             Prep. Tint. Flush. Nourish. Glow.
           </p>
 
-          {/* Interactive Expandable Shade Explorer */}
-          <div style={{ marginTop: '1.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.85rem' }}>
-            <ShadeExplorer onAddToCart={onAddToCart} buttonText="Shades" />
-            <span
-              style={{
-                fontSize: '0.72rem',
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                color: '#7F6B64',
-                fontWeight: 600,
-              }}
-            >
-              Explore Shades
-            </span>
-          </div>
+
         </div>
       </div>
 
