@@ -826,12 +826,12 @@ h1, h2, h3, h4, .font-serif {
 /* Liquid circle: expands from center to flood entire button */
 .flow-btn-circle {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
   width: 16px;
   height: 16px;
-  background-color: var(--color-espresso);
+  background-color: var(--color-espresso, #3A2E2B);
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
@@ -843,8 +843,9 @@ h1, h2, h3, h4, .font-serif {
 }
 
 .flow-btn:hover .flow-btn-circle {
-  width: 340px;
-  height: 340px;
+  transform: translate(-50%, -50%) !important;
+  width: 360px;
+  height: 360px;
   opacity: 1;
 }
 
@@ -4784,15 +4785,13 @@ button.h-11.w-11.rounded-full {
 }
 
 .elora-expandable-shade-btn:hover,
-button.h-11.w-11.rounded-full:hover,
-.hover\:w-36:hover {
+button.elora-expandable-shade-btn:hover {
   width: 144px !important;
   background-color: #271C19;
   box-shadow: 0 6px 22px rgba(58, 46, 43, 0.24);
 }
 
-.elora-shade-btn-label,
-.group .opacity-0.tracking-widest {
+.elora-shade-btn-label {
   opacity: 0;
   transform: translateX(12px);
   transition: opacity 220ms ease, transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -4805,16 +4804,12 @@ button.h-11.w-11.rounded-full:hover,
   user-select: none;
 }
 
-.elora-expandable-shade-btn:hover .elora-shade-btn-label,
-.group:hover .group-hover\:-translate-x-3,
-.group:hover .group-hover\:opacity-100,
-button.h-11.w-11:hover span {
+.elora-expandable-shade-btn:hover .elora-shade-btn-label {
   opacity: 1 !important;
   transform: translateX(-12px) !important;
 }
 
-.elora-shade-btn-icon,
-.right-3\.5 {
+.elora-shade-btn-icon {
   position: absolute;
   right: 14px;
   display: flex;
@@ -4824,8 +4819,7 @@ button.h-11.w-11:hover span {
   transition: transform 250ms ease;
 }
 
-.elora-expandable-shade-btn:hover .elora-shade-btn-icon,
-button.h-11.w-11:hover .right-3\.5 {
+.elora-expandable-shade-btn:hover .elora-shade-btn-icon {
   transform: translateX(2px);
 }
 
