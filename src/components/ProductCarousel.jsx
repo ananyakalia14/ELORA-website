@@ -20,6 +20,7 @@ export default function ProductCarousel({
   const scrollContainerRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [hoveredCardId, setHoveredCardId] = useState(null);
 
   const checkScrollState = () => {
     const el = scrollContainerRef.current;
@@ -106,39 +107,45 @@ export default function ProductCarousel({
         role="region"
         aria-label="Product Carousel"
       >
-        {products.map((item) => (
-          <article
-            key={item.id}
-            className="elora-carousel-card"
-            onClick={() => onQuickView && onQuickView(item)}
-            role="button"
-            tabIndex={0}
-            aria-label={`View details for ${item.name}`}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                if (onQuickView) onQuickView(item);
-              }
-            }}
-          >
-            {/* Edge-to-Edge Media Card: No outer box panels, texts on image itself */}
-            <div className="elora-card-media-canvas">
-              
-              {/* PRIMARY PACKSHOT IMAGE (Visible by default) */}
-              <img
-                src={item.primaryImage}
-                alt={`${item.name} studio packshot`}
-                className="elora-image-primary"
-                loading="lazy"
-              />
+        {products.map((item) => {
+          const isItemHovered = hoveredCardId === item.id;
+          return (
+            <article
+              key={item.id}
+              className={`elora-carousel-card ${isItemHovered ? 'is-hovered' : ''}`}
+              onMouseEnter={() => setHoveredCardId(item.id)}
+              onMouseLeave={() => setHoveredCardId(null)}
+              onClick={() => onQuickView && onQuickView(item)}
+              role="button"
+              tabIndex={0}
+              aria-label={`View details for ${item.name}`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  if (onQuickView) onQuickView(item);
+                }
+              }}
+            >
+              {/* Edge-to-Edge Media Card: No outer box panels, texts on image itself */}
+              <div className="elora-card-media-canvas">
+                
+                {/* PRIMARY PACKSHOT IMAGE (Visible by default) */}
+                <img
+                  src={item.primaryImage}
+                  alt={`${item.name} studio packshot`}
+                  className={`elora-image-primary ${isItemHovered ? 'is-faded' : ''}`}
+                  loading="lazy"
+                />
 
-              {/* SECONDARY TEXTURE/LIFESTYLE IMAGE (Cross-fades in on hover) */}
-              <img
-                src={item.hoverImage}
-                alt={`${item.name} editorial campaign`}
-                className="elora-image-hover"
-                loading="eager"
-              />
+                {/* SECONDARY TEXTURE/LIFESTYLE IMAGE (Cross-fades in on hover) */}
+                {item.hoverImage && (
+                  <img
+                    src={item.hoverImage}
+                    alt={`${item.name} editorial campaign`}
+                    className={`elora-image-hover ${isItemHovered ? 'is-active' : ''}`}
+                    loading="eager"
+                  />
+                )}
 
               {/* Soft Editorial Scrims right over the photo */}
               <div className="elora-card-scrim-top" aria-hidden="true" />
@@ -195,7 +202,8 @@ export default function ProductCarousel({
 
             </div>
           </article>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -7,7 +7,10 @@ import ProductSection from './components/ProductSection';
 import ProductModal from './components/ProductModal';
 import GlazingMilkDetailView from './components/GlazingMilkDetailView';
 import ShadeDetailView from './components/ShadeDetailView';
+import LipTintDetailView from './components/LipTintDetailView';
 import ElixirDetailView from './components/ElixirDetailView';
+import NectarDetailView from './components/NectarDetailView';
+import LipLinerDetailView from './components/LipLinerDetailView';
 import PhilosophySection from './components/PhilosophySection';
 import ValuesSection from './components/ValuesSection';
 import PressSection from './components/PressSection';
@@ -35,8 +38,11 @@ export default function App() {
   // Modal quick view state
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [glazingMilkViewOpen, setGlazingMilkViewOpen] = useState(false);
+  const [lipTintViewOpen, setLipTintViewOpen] = useState(false);
   const [shadeViewOpen, setShadeViewOpen] = useState(false);
   const [elixirViewOpen, setElixirViewOpen] = useState(false);
+  const [nectarViewOpen, setNectarViewOpen] = useState(false);
+  const [lipLinerViewOpen, setLipLinerViewOpen] = useState(false);
   const [selectedShadeForView, setSelectedShadeForView] = useState(null);
 
   const handleOpenProduct = (product) => {
@@ -53,6 +59,15 @@ export default function App() {
       (product.name && product.name.toLowerCase().includes('elixir')) ||
       (product.name && product.name.toLowerCase().includes('glazed barrier'));
 
+    const isNectar =
+      product.id === 'nectar' ||
+      (product.name && product.name.toLowerCase().includes('nectar'));
+
+    const isLipLiner =
+      product.id === 'hero-serum' ||
+      (product.name && product.name.toLowerCase().includes('color')) ||
+      (product.name && product.name.toLowerCase().includes('liner'));
+
     const isLipTint =
       product.id === 'brume' ||
       (product.name && product.name.toLowerCase().includes('tint')) ||
@@ -62,9 +77,12 @@ export default function App() {
       setGlazingMilkViewOpen(true);
     } else if (isElixir) {
       setElixirViewOpen(true);
+    } else if (isNectar) {
+      setNectarViewOpen(true);
+    } else if (isLipLiner) {
+      setLipLinerViewOpen(true);
     } else if (isLipTint) {
-      setSelectedShadeForView(null);
-      setShadeViewOpen(true);
+      setLipTintViewOpen(true);
     } else {
       setSelectedProduct(product);
     }
@@ -216,6 +234,42 @@ export default function App() {
         onAddToCart={handleAddToCart}
         onOpenCart={() => {
           setElixirViewOpen(false);
+          setCartOpen(true);
+        }}
+        cartCount={totalCartCount}
+      />
+
+      {/* Full-Screen Barrier Repair Nectar Detail View */}
+      <NectarDetailView
+        isOpen={nectarViewOpen}
+        onClose={() => setNectarViewOpen(false)}
+        onAddToCart={handleAddToCart}
+        onOpenCart={() => {
+          setNectarViewOpen(false);
+          setCartOpen(true);
+        }}
+        cartCount={totalCartCount}
+      />
+
+      {/* Full-Screen Color, The Élora Way / Lip Liner Detail View */}
+      <LipLinerDetailView
+        isOpen={lipLinerViewOpen}
+        onClose={() => setLipLinerViewOpen(false)}
+        onAddToCart={handleAddToCart}
+        onOpenCart={() => {
+          setLipLinerViewOpen(false);
+          setCartOpen(true);
+        }}
+        cartCount={totalCartCount}
+      />
+
+      {/* Full-Screen Dedicated Peptide Lip Tint Detail View */}
+      <LipTintDetailView
+        isOpen={lipTintViewOpen}
+        onClose={() => setLipTintViewOpen(false)}
+        onAddToCart={handleAddToCart}
+        onOpenCart={() => {
+          setLipTintViewOpen(false);
           setCartOpen(true);
         }}
         cartCount={totalCartCount}

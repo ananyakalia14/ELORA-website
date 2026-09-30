@@ -27,7 +27,7 @@ export const DEFAULT_CAROUSEL_PRODUCTS = [
     rating: 4.8,
     reviews: 142,
     primaryImage: "/images/products/mist-packshot.jpg",
-    hoverImage: "/images/products/mist-lifestyle.jpg"
+    hoverImage: "/images/products/liptint-cake-hover.jpg"
   },
   {
     id: "elixir",
@@ -40,13 +40,13 @@ export const DEFAULT_CAROUSEL_PRODUCTS = [
     rating: 4.9,
     reviews: 89,
     primaryImage: "/images/products/elixir-packshot.jpg",
-    hoverImage: "/images/products/elixir-hover.png"
+    hoverImage: "/elixir-model-hover.jpg"
   },
   {
     id: "hero-serum",
     category: "la couleur",
     badge: "Signature Hero",
-    name: "COLOR,THE ÉLORA WAY",
+    name: "COLOR, THE ÉLORA WAY",
     description: "A little flush, wherever you want it.",
     price: "$98.00",
     numericPrice: 98,

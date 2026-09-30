@@ -223,7 +223,11 @@ export default function AccountPage({
                   <p className="elora-account-page-subtitle">SKIN &amp; BEAUTY</p>
                 </div>
 
-                <form onSubmit={handleSignIn} className="elora-account-page-form">
+                <form onSubmit={handleSignIn} className="elora-account-page-form" autoComplete="off">
+                  {/* Hidden dummy fields to prevent aggressive Chrome/Edge credentials autofill */}
+                  <input type="text" name="prevent_autofill_email" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
+                  <input type="password" name="prevent_autofill_pwd" style={{ display: 'none' }} tabIndex={-1} autoComplete="new-password" />
+
                   {errorMessage && (
                     <div className="elora-account-error-msg">{errorMessage}</div>
                   )}
@@ -232,12 +236,18 @@ export default function AccountPage({
                   <div className="elora-account-pill-input">
                     <Mail size={18} className="elora-account-pill-icon" />
                     <input
-                      type="email"
-                      placeholder="Email"
+                      id="elora-signin-email"
+                      name="elora_user_email"
+                      type="text"
+                      inputMode="email"
+                      placeholder="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="elora-account-pill-field"
-                      autoComplete="email"
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck="false"
                       required
                     />
                   </div>
@@ -246,12 +256,14 @@ export default function AccountPage({
                   <div className="elora-account-pill-input">
                     <Lock size={18} className="elora-account-pill-icon" />
                     <input
+                      id="elora-signin-password"
+                      name="elora_user_key"
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="Password"
+                      placeholder="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="elora-account-pill-field"
-                      autoComplete="current-password"
+                      autoComplete="new-password"
                       required
                     />
                     <button
