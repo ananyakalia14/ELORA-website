@@ -7,6 +7,7 @@ import ProductSection from './components/ProductSection';
 import ProductModal from './components/ProductModal';
 import GlazingMilkDetailView from './components/GlazingMilkDetailView';
 import ShadeDetailView from './components/ShadeDetailView';
+import ElixirDetailView from './components/ElixirDetailView';
 import PhilosophySection from './components/PhilosophySection';
 import ValuesSection from './components/ValuesSection';
 import PressSection from './components/PressSection';
@@ -35,6 +36,7 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [glazingMilkViewOpen, setGlazingMilkViewOpen] = useState(false);
   const [shadeViewOpen, setShadeViewOpen] = useState(false);
+  const [elixirViewOpen, setElixirViewOpen] = useState(false);
   const [selectedShadeForView, setSelectedShadeForView] = useState(null);
 
   const handleOpenProduct = (product) => {
@@ -46,6 +48,11 @@ export default function App() {
       (product.name && product.name.toLowerCase().includes('glazing')) ||
       (product.name && product.name.toLowerCase().includes('milk'));
 
+    const isElixir =
+      product.id === 'elixir' ||
+      (product.name && product.name.toLowerCase().includes('elixir')) ||
+      (product.name && product.name.toLowerCase().includes('glazed barrier'));
+
     const isLipTint =
       product.id === 'brume' ||
       (product.name && product.name.toLowerCase().includes('tint')) ||
@@ -53,6 +60,8 @@ export default function App() {
 
     if (isGlazingMilk) {
       setGlazingMilkViewOpen(true);
+    } else if (isElixir) {
+      setElixirViewOpen(true);
     } else if (isLipTint) {
       setSelectedShadeForView(null);
       setShadeViewOpen(true);
@@ -151,8 +160,8 @@ export default function App() {
         <main id="main-content">
           {/* Hero Section */}
           <HeroSection
-            onShopHero={() => handleAddToCart(heroSerum)}
-            onQuickView={() => setSelectedProduct(heroSerum)}
+            onShopHero={() => setElixirViewOpen(true)}
+            onQuickView={() => setElixirViewOpen(true)}
           />
 
           {/* Curated Botanical Edit with Shade/Variant Swatches */}
@@ -195,6 +204,18 @@ export default function App() {
         onAddToCart={handleAddToCart}
         onOpenCart={() => {
           setGlazingMilkViewOpen(false);
+          setCartOpen(true);
+        }}
+        cartCount={totalCartCount}
+      />
+
+      {/* Full-Screen The Glazed Barrier Elixir Product Detail View */}
+      <ElixirDetailView
+        isOpen={elixirViewOpen}
+        onClose={() => setElixirViewOpen(false)}
+        onAddToCart={handleAddToCart}
+        onOpenCart={() => {
+          setElixirViewOpen(false);
           setCartOpen(true);
         }}
         cartCount={totalCartCount}
