@@ -6690,6 +6690,1596 @@ button.elora-expandable-shade-btn:hover {
   }
 }
 
+/* =========================================================================
+   EDITORIAL COMING SOON MODAL (THE JOURNAL, STORE LOCATOR)
+   ========================================================================= */
+
+.elora-coming-soon-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(36, 28, 26, 0.75);
+  backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.elora-coming-soon-wrapper {
+  position: relative;
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.elora-coming-soon-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(58, 46, 43, 0.08);
+  border: 1px solid rgba(58, 46, 43, 0.15);
+  color: var(--color-espresso);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.elora-coming-soon-close:hover {
+  background: #3A2E2B;
+  color: #FFFDF9;
+  transform: rotate(90deg);
+}
+
+.elora-coming-soon-card {
+  background: #FAF7F2;
+  border: 1px solid rgba(194, 159, 130, 0.4);
+  border-radius: 28px;
+  padding: 3.5rem 2.5rem 2.5rem 2.5rem;
+  box-shadow: 0 25px 70px rgba(36, 28, 26, 0.25);
+  text-align: center;
+}
+
+.elora-coming-soon-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(194, 159, 130, 0.15);
+  border: 1px solid rgba(194, 159, 130, 0.35);
+  color: #8C6A53;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
+}
+
+.elora-coming-soon-title {
+  font-family: var(--font-serif-display);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  color: var(--color-espresso);
+  font-weight: 400;
+  margin: 0 0 1rem 0;
+  line-height: 1.15;
+}
+
+.elora-coming-soon-subtitle {
+  font-size: 0.95rem;
+  color: #6B5B56;
+  line-height: 1.65;
+  max-width: 520px;
+  margin: 0 auto 2rem auto;
+  font-weight: 300;
+}
+
+/* Journal Grid */
+.elora-coming-soon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+@media (max-width: 640px) {
+  .elora-coming-soon-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.elora-coming-soon-item {
+  background: #FFFDF9;
+  border: 1px solid rgba(58, 46, 43, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem 1rem;
+}
+
+.elora-item-num {
+  display: block;
+  font-family: ui-monospace, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: #C29F82;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.elora-coming-soon-item h4 {
+  font-family: var(--font-serif-display);
+  font-size: 1rem;
+  color: var(--color-espresso);
+  margin: 0 0 0.4rem 0;
+  line-height: 1.25;
+}
+
+.elora-coming-soon-item p {
+  font-size: 0.74rem;
+  color: #7A6964;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Store Cards */
+.elora-coming-soon-stores-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+@media (max-width: 640px) {
+  .elora-coming-soon-stores-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.elora-store-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #FFFDF9;
+  border: 1px solid rgba(58, 46, 43, 0.08);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+}
+
+.elora-store-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(194, 159, 130, 0.15);
+  color: #8C6A53;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  shrink: 0;
+}
+
+.elora-store-info h5 {
+  font-family: var(--font-serif-display);
+  font-size: 0.95rem;
+  color: var(--color-espresso);
+  margin: 2px 0 0 0;
+}
+
+.elora-store-city {
+  display: block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #C29F82;
+  font-weight: 700;
+}
+
+.elora-store-info small {
+  display: block;
+  font-size: 0.72rem;
+  color: #7A6964;
+  margin-top: 2px;
+}
+
+/* Signup Box */
+.elora-coming-soon-signup-box {
+  background: #FFFFFF;
+  border: 1px solid rgba(194, 159, 130, 0.3);
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.elora-form-label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  color: var(--color-espresso);
+  margin-bottom: 0.75rem;
+}
+
+.elora-form-row {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 500px) {
+  .elora-form-row {
+    flex-direction: column;
+  }
+}
+
+.elora-coming-soon-input {
+  flex: 1;
+  padding: 12px 16px;
+  background: #FAF7F2;
+  border: 1px solid rgba(58, 46, 43, 0.12);
+  border-radius: 12px;
+  font-size: 0.86rem;
+  color: var(--color-espresso);
+  outline: none;
+}
+
+.elora-coming-soon-input:focus {
+  border-color: #C29F82;
+  background: #FFFFFF;
+}
+
+.elora-coming-soon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #3A2E2B;
+  color: #FFFDF9;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.elora-coming-soon-btn:hover {
+  background: #241C1A;
+  transform: translateY(-1px);
+}
+
+.elora-coming-soon-success {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.elora-success-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #27672B;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  shrink: 0;
+}
+
+.elora-coming-soon-success h6 {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #27672B;
+  margin: 0 0 2px 0;
+}
+
+.elora-coming-soon-success p {
+  font-size: 0.78rem;
+  color: #6B5B56;
+  margin: 0;
+}
+
+.elora-return-shop-btn {
+  background: none;
+  border: none;
+  color: #8C6A53;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.elora-return-shop-btn:hover {
+  color: var(--color-espresso);
+}
 
 
+/* =========================================================================
+   ADMIN DASHBOARD ATELIER STYLES
+   ========================================================================= */
 
+.elora-admin-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(22, 17, 16, 0.85);
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.elora-admin-shell {
+  background: #1C1615;
+  color: #FAF7F2;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 24px;
+  max-width: 1100px;
+  width: 100%;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+}
+
+.elora-admin-header {
+  padding: 1.25rem 2rem;
+  background: #251E1C;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.elora-admin-badge {
+  display: inline-block;
+  font-family: ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: #D4AF37;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.elora-admin-title-area h2 {
+  font-family: var(--font-serif-display);
+  font-size: 1.4rem;
+  color: #FFFDF9;
+  margin: 0;
+}
+
+.elora-admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.elora-admin-btn-icon,
+.elora-admin-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #FAF7F2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.elora-admin-btn-icon:hover,
+.elora-admin-close-btn:hover {
+  background: #D4AF37;
+  color: #1C1615;
+}
+
+/* Admin Login Card */
+.elora-admin-login-view {
+  padding: 4rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.elora-admin-login-card {
+  max-width: 440px;
+  width: 100%;
+  background: #251E1C;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.elora-admin-lock-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem auto;
+}
+
+.elora-admin-login-card h3 {
+  font-family: var(--font-serif-display);
+  font-size: 1.6rem;
+  color: #FFFDF9;
+  margin: 0 0 0.5rem 0;
+}
+
+.elora-admin-login-card p {
+  font-size: 0.82rem;
+  color: #A89A95;
+  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+}
+
+.elora-admin-field-wrap {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.elora-admin-field-wrap label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #C2B3AE;
+  margin-bottom: 4px;
+}
+
+.elora-admin-field-wrap input {
+  width: 100%;
+  padding: 10px 14px;
+  background: #1C1615;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: #FFFFFF;
+  font-size: 0.88rem;
+  outline: none;
+}
+
+.elora-admin-field-wrap input:focus {
+  border-color: #D4AF37;
+}
+
+.elora-admin-login-btn {
+  width: 100%;
+  padding: 12px;
+  background: #D4AF37;
+  color: #1C1615;
+  font-weight: 700;
+  font-size: 0.84rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: all 0.2s;
+}
+
+.elora-admin-login-btn:hover {
+  background: #E5C358;
+}
+
+/* Admin Tabs */
+.elora-admin-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+}
+
+.elora-admin-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+
+.elora-admin-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #A89A95;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.elora-admin-tab.is-active {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: #D4AF37;
+  color: #D4AF37;
+}
+
+/* KPI Cards */
+.elora-admin-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 800px) {
+  .elora-admin-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.elora-admin-kpi-card {
+  background: #251E1C;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.elora-kpi-label {
+  display: block;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: #A89A95;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.elora-kpi-val {
+  font-family: var(--font-serif-display);
+  font-size: 1.8rem;
+  color: #FFFDF9;
+  margin: 0 0 0.35rem 0;
+}
+
+.elora-admin-kpi-card small {
+  font-size: 0.72rem;
+  color: #7A6964;
+}
+
+/* Status Strip */
+.elora-admin-status-strip {
+  background: #251E1C;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.elora-admin-status-strip h4 {
+  font-size: 0.82rem;
+  color: #A89A95;
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.elora-admin-status-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.status-pill.pending { background: rgba(234, 179, 8, 0.2); color: #FACC15; }
+.status-pill.confirmed { background: rgba(59, 130, 246, 0.2); color: #60A5FA; }
+.status-pill.shipped { background: rgba(168, 85, 247, 0.2); color: #C084FC; }
+.status-pill.delivered { background: rgba(34, 197, 94, 0.2); color: #4ADE80; }
+.status-pill.cancelled { background: rgba(239, 68, 68, 0.2); color: #F87171; }
+
+/* Tables */
+.elora-admin-table-wrap {
+  background: #251E1C;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow-x: auto;
+}
+
+.elora-admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.82rem;
+}
+
+.elora-admin-table th {
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.2);
+  color: #A89A95;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.elora-admin-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #DED6D3;
+}
+
+.elora-prod-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.elora-prod-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #3A2E2B;
+}
+
+.elora-item-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 6px;
+  background: rgba(212, 175, 55, 0.15);
+  color: #D4AF37;
+  font-size: 0.65rem;
+  border-radius: 4px;
+}
+
+.stock-tag {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.stock-tag.good { background: rgba(34, 197, 94, 0.15); color: #4ADE80; }
+.stock-tag.low { background: rgba(239, 68, 68, 0.15); color: #F87171; }
+
+.role-tag.admin { background: rgba(212, 175, 55, 0.2); color: #D4AF37; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 0.7rem; }
+.role-tag.customer { background: rgba(255, 255, 255, 0.08); color: #A89A95; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; }
+
+.elora-table-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #FFFDF9;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.elora-table-edit-btn:hover {
+  background: #D4AF37;
+  color: #1C1615;
+}
+
+.elora-status-select {
+  padding: 4px 8px;
+  background: #1C1615;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  outline: none;
+}
+
+.order-item-chip {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  margin-right: 4px;
+  margin-bottom: 2px;
+}
+
+/* Edit Modal */
+.elora-edit-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.elora-edit-modal {
+  background: #251E1C;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 18px;
+  max-width: 400px;
+  width: 100%;
+  padding: 1.5rem;
+}
+
+.elora-edit-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.elora-edit-modal-header h4 {
+  font-family: var(--font-serif-display);
+  font-size: 1.15rem;
+  color: #FFFDF9;
+  margin: 0;
+}
+
+.elora-edit-field {
+  margin-bottom: 1rem;
+}
+
+.elora-edit-field label {
+  display: block;
+  font-size: 0.72rem;
+  color: #A89A95;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.elora-edit-field input {
+  width: 100%;
+  padding: 8px 12px;
+  background: #1C1615;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: #FFF;
+  font-size: 0.9rem;
+}
+
+.elora-edit-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 1.5rem;
+}
+
+.elora-btn-cancel {
+  padding: 8px 14px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #A89A95;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.elora-btn-save {
+  padding: 8px 16px;
+  background: #D4AF37;
+  color: #1C1615;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.elora-admin-success-banner {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #4ADE80;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+  font-size: 0.84rem;
+}
+
+.elora-admin-error-banner {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #F87171;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+  font-size: 0.84rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ÉLORA EDITORIAL COMING SOON EXPERIENCE (THE JOURNAL & STORE LOCATOR)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.elora-coming-soon-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(46, 26, 22, 0.68);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  overflow-y: auto;
+  animation: eloraFadeIn 0.3s ease-out forwards;
+}
+
+@keyframes eloraFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.elora-coming-soon-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 780px;
+  max-height: 92vh;
+  margin: auto;
+  animation: eloraScaleUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes eloraScaleUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.elora-coming-soon-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(249, 246, 240, 0.9);
+  border: 1px solid rgba(194, 159, 130, 0.3);
+  color: #3A2E2B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(46, 26, 22, 0.08);
+}
+
+.elora-coming-soon-close:hover {
+  background: #3A2E2B;
+  color: #FFFDF9;
+  transform: rotate(90deg);
+}
+
+.elora-coming-soon-card {
+  background: #FFFDF9;
+  border: 1px solid rgba(194, 159, 130, 0.3);
+  border-radius: 28px;
+  padding: 3rem 2.8rem;
+  box-shadow: 0 25px 70px rgba(46, 26, 22, 0.25);
+  overflow-y: auto;
+  max-height: 88vh;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .elora-coming-soon-card {
+    padding: 2.2rem 1.4rem;
+    border-radius: 20px;
+  }
+}
+
+.elora-coming-soon-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: #F9F6F0;
+  border: 1px solid rgba(194, 159, 130, 0.4);
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7B6862;
+  margin-bottom: 1.5rem;
+}
+
+.elora-coming-soon-title {
+  font-family: var(--font-serif-display, 'Italiana', 'Cormorant Garamond', Georgia, serif);
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  font-weight: 400;
+  color: #2E1A16;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 auto 1rem auto;
+}
+
+.elora-coming-soon-subtitle {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+  color: #5A4A45;
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 580px;
+  margin: 0 auto 2.2rem auto;
+}
+
+/* Journal Feature Grid */
+.elora-coming-soon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2.4rem;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .elora-coming-soon-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.elora-coming-soon-item {
+  background: #F9F6F0;
+  border: 1px solid rgba(194, 159, 130, 0.25);
+  border-radius: 18px;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.elora-coming-soon-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(194, 159, 130, 0.6);
+  box-shadow: 0 8px 24px rgba(46, 26, 22, 0.06);
+}
+
+.elora-item-num {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #C29F82;
+  margin-bottom: 0.4rem;
+}
+
+.elora-coming-soon-item h4 {
+  font-family: var(--font-serif-display, Georgia, serif);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #2E1A16;
+  margin: 0 0 0.4rem 0;
+  line-height: 1.3;
+}
+
+.elora-coming-soon-item p {
+  font-size: 0.82rem;
+  color: #6C5B56;
+  line-height: 1.5;
+  margin: 0;
+  font-weight: 300;
+}
+
+/* Stores Feature Grid */
+.elora-coming-soon-stores-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 2.4rem;
+  text-align: left;
+}
+
+@media (max-width: 640px) {
+  .elora-coming-soon-stores-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.elora-store-card {
+  background: #F9F6F0;
+  border: 1px solid rgba(194, 159, 130, 0.25);
+  border-radius: 18px;
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: all 0.3s ease;
+}
+
+.elora-store-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(194, 159, 130, 0.6);
+  box-shadow: 0 8px 24px rgba(46, 26, 22, 0.06);
+}
+
+.elora-store-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(194, 159, 130, 0.15);
+  color: #3A2E2B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.elora-store-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.elora-store-city {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #C29F82;
+  margin-bottom: 2px;
+}
+
+.elora-store-info h5 {
+  font-family: var(--font-serif-display, Georgia, serif);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #2E1A16;
+  margin: 0 0 4px 0;
+}
+
+.elora-store-info small {
+  font-size: 0.76rem;
+  color: #8C7A75;
+  font-weight: 400;
+}
+
+/* Signup Box */
+.elora-coming-soon-signup-box {
+  background: #F9F6F0;
+  border: 1px solid rgba(194, 159, 130, 0.35);
+  border-radius: 20px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.8rem;
+}
+
+@media (max-width: 640px) {
+  .elora-coming-soon-signup-box {
+    padding: 1.25rem 1rem;
+  }
+}
+
+.elora-form-label {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7B6862;
+  margin-bottom: 1rem;
+}
+
+.elora-form-row {
+  display: flex;
+  gap: 8px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+@media (max-width: 520px) {
+  .elora-form-row {
+    flex-direction: column;
+  }
+}
+
+.elora-coming-soon-input {
+  flex: 1;
+  padding: 12px 18px;
+  background: #FFFDF9;
+  border: 1px solid rgba(194, 159, 130, 0.4);
+  border-radius: 9999px;
+  font-size: 0.88rem;
+  color: #2E1A16;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.elora-coming-soon-input:focus {
+  border-color: #3A2E2B;
+  box-shadow: 0 0 0 3px rgba(58, 46, 43, 0.08);
+}
+
+.elora-coming-soon-btn {
+  padding: 12px 24px;
+  background: #3A2E2B;
+  color: #FFFDF9;
+  border: none;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.elora-coming-soon-btn:hover {
+  background: #231B19;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(46, 26, 22, 0.2);
+}
+
+/* Success notification */
+.elora-coming-soon-success {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  background: #FFFDF9;
+  border: 1px solid rgba(194, 159, 130, 0.4);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+}
+
+.elora-success-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #3A2E2B;
+  color: #FFFDF9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.elora-coming-soon-success h6 {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #2E1A16;
+  margin: 0 0 2px 0;
+}
+
+.elora-coming-soon-success p {
+  font-size: 0.8rem;
+  color: #6C5B56;
+  margin: 0;
+  font-weight: 300;
+}
+
+/* Return button */
+.elora-coming-soon-footer-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.elora-return-shop-btn {
+  background: none;
+  border: none;
+  color: #7B6862;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 6px 12px;
+}
+
+.elora-return-shop-btn:hover {
+  color: #2E1A16;
+  text-decoration: underline;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN ADAPTATIONS (MOBILE, TABLET, FOLDABLE, DESKTOP PRESERVED)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Mobile Hamburger Menu Toggle & Drawer */
+.header-mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--color-espresso);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: opacity 0.2s ease;
+}
+
+.header-mobile-menu-btn:hover {
+  opacity: 0.65;
+}
+
+@media (max-width: 768px) {
+  .header-mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header-left {
+    flex: 0 0 auto;
+    gap: 0.5rem;
+  }
+
+  .header-right {
+    flex: 0 0 auto;
+    gap: clamp(0.6rem, 2.5vw, 1.25rem);
+  }
+
+  .header-center-logo {
+    max-width: clamp(95px, 26vw, 125px);
+  }
+}
+
+/* Luxury Full-Screen Mobile Directory Drawer */
+.elora-mobile-nav-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(249, 246, 240, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: eloraFadeIn 0.25s ease-out forwards;
+}
+
+.elora-mobile-nav-inner {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2.5rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.elora-mobile-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(58, 46, 43, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.elora-mobile-nav-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #C29F82;
+}
+
+.elora-mobile-nav-close {
+  background: none;
+  border: none;
+  color: #3A2E2B;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.elora-mobile-nav-close:hover {
+  background: rgba(58, 46, 43, 0.08);
+}
+
+.elora-mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.elora-mobile-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.15rem;
+  background: #FFFDF9;
+  border: 1px solid rgba(194, 159, 130, 0.25);
+  border-radius: 16px;
+  text-decoration: none;
+  transition: all 0.22s ease;
+}
+
+.elora-mobile-nav-item:hover,
+.elora-mobile-nav-item:active {
+  background: #F4ECE1;
+  border-color: rgba(194, 159, 130, 0.6);
+  transform: translateX(3px);
+}
+
+.elora-mobile-nav-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.elora-mobile-nav-title {
+  font-family: var(--font-serif-display, 'Italiana', Georgia, serif);
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #2E1A16;
+}
+
+.elora-mobile-nav-desc {
+  font-size: 0.76rem;
+  color: #7B6862;
+  font-weight: 300;
+}
+
+.elora-mobile-nav-arrow {
+  color: #C29F82;
+  transition: transform 0.2s ease;
+}
+
+.elora-mobile-nav-item:hover .elora-mobile-nav-arrow {
+  transform: translateX(4px);
+  color: #2E1A16;
+}
+
+.elora-mobile-nav-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid rgba(58, 46, 43, 0.1);
+}
+
+.elora-mobile-nav-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: #FFFDF9;
+  border: 1px solid rgba(58, 46, 43, 0.15);
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #3A2E2B;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.elora-mobile-nav-action-btn:hover {
+  background: #3A2E2B;
+  color: #FFFDF9;
+}
+
+/* Science Section Styles (Desktop + Mobile Responsive) */
+.science-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4.5rem;
+  align-items: center;
+  max-width: 1380px;
+  margin: 0 auto;
+}
+
+.science-media-frame {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(58, 46, 43, 0.12);
+  background: #EFE8DE;
+}
+
+.science-media-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+
+.science-media-frame:hover img {
+  transform: scale(1.03);
+}
+
+.science-pill-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.science-pill-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 1.15rem 1.4rem;
+  background: rgba(249, 246, 240, 0.65);
+  border: 1px solid rgba(194, 159, 130, 0.25);
+  border-radius: 18px;
+  transition: all 0.25s ease;
+}
+
+.science-pill-item:hover {
+  background: #FFFDF9;
+  border-color: rgba(194, 159, 130, 0.55);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(58, 46, 43, 0.05);
+}
+
+.science-bullet-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #C29F82;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1023px) {
+  .science-container {
+    grid-template-columns: 1fr;
+    gap: 2.8rem;
+  }
+
+  .science-media-frame {
+    aspect-ratio: 4 / 3;
+    border-radius: 20px;
+  }
+}
+
+/* Values Section (Desktop + Mobile Responsive) */
+.elora-values-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  min-height: 620px;
+}
+
+.elora-values-left-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(36px, 5.5vw, 80px);
+  box-sizing: border-box;
+}
+
+.elora-values-right-col {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 620px;
+  background-color: #FAF6F0;
+  overflow: hidden;
+}
+
+@media (max-width: 1023px) {
+  .elora-values-grid {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .elora-values-left-col {
+    padding: 2.5rem 1.25rem;
+  }
+
+  .elora-values-right-col {
+    min-height: 340px;
+    height: 340px;
+  }
+}
+
+/* Press Section on Mobile */
+@media (max-width: 768px) {
+  .press-section {
+    margin: 2rem 1rem;
+    padding: 2.5rem 1.25rem 2rem 1.25rem;
+    border-radius: 20px;
+  }
+
+  .press-quote-text {
+    font-size: clamp(1.15rem, 4.2vw, 1.55rem);
+    line-height: 1.45;
+  }
+}
+
+/* Small Device Screen Safety (< 400px: iPhone SE 375px, Galaxy Z Fold Cover 378px) */
+@media (max-width: 400px) {
+  .cart-drawer {
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  .cart-header {
+    padding: 1.2rem 1rem;
+  }
+
+  .cart-body {
+    padding: 1rem 0.85rem;
+  }
+
+  .elora-coming-soon-card {
+    padding: 2rem 1rem;
+  }
+}
+
+/* Universal Responsive Utility Classes */
+.mobile-only {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: block !important;
+  }
+  button.mobile-only, a.mobile-only {
+    display: inline-flex !important;
+  }
+}
+
+/* Viewport Overflow Protection for All Mobile & Foldable Screens */
+.app-root,
+.landing-page-content {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Tablet & Foldables Landscape Adjustments (Surface Pro, iPad, Nest Hub) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .science-container {
+    gap: 2.5rem;
+  }
+  .elora-values-grid {
+    grid-template-columns: 1fr 1fr;
+    min-height: 520px;
+  }
+  .elora-values-left-col {
+    padding: 3rem 2rem;
+  }
+  .elora-carousel-card {
+    flex: 0 0 calc((100% - 24px) / 2);
+    max-width: calc((100% - 24px) / 2);
+  }
+}

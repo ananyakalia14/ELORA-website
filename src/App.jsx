@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AnnouncementTicker from './components/AnnouncementTicker';
 import IntroSequence from './components/IntroSequence';
 import Header from './components/Header';
@@ -12,6 +12,7 @@ import ElixirDetailView from './components/ElixirDetailView';
 import NectarDetailView from './components/NectarDetailView';
 import LipLinerDetailView from './components/LipLinerDetailView';
 import PhilosophySection from './components/PhilosophySection';
+import ScienceSection from './components/ScienceSection';
 import ValuesSection from './components/ValuesSection';
 import PressSection from './components/PressSection';
 import CartDrawer from './components/CartDrawer';
@@ -19,6 +20,8 @@ import SearchDrawer from './components/SearchDrawer';
 import AccountPage from './components/AccountPage';
 import CheckoutPage from './components/CheckoutPage';
 import MobileStickyCta from './components/MobileStickyCta';
+import EditorialComingSoon from './components/EditorialComingSoon';
+import AdminDashboard from './components/AdminDashboard';
 import Footer from './components/Footer';
 import { PRODUCTS } from './data/products';
 
@@ -35,6 +38,12 @@ export default function App() {
   // Checkout page state
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
+  // Coming Soon modal state (journal / stores)
+  const [comingSoon, setComingSoon] = useState({ isOpen: false, type: 'journal' });
+
+  // Admin Dashboard modal state
+  const [adminOpen, setAdminOpen] = useState(false);
+
   // Cart state (starts empty with BAG (0) as requested)
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
@@ -48,6 +57,77 @@ export default function App() {
   const [nectarViewOpen, setNectarViewOpen] = useState(false);
   const [lipLinerViewOpen, setLipLinerViewOpen] = useState(false);
   const [selectedShadeForView, setSelectedShadeForView] = useState(null);
+
+  const handleNavigate = (target) => {
+    if (!target) return;
+    const cleanHash = target.startsWith('#') ? target.slice(1).toLowerCase() : target.toLowerCase();
+
+    // Instantly reveal landing content if intro was running
+    setIntroFinished(true);
+    setLandingVisible(true);
+
+    if (cleanHash === 'journal') {
+      setComingSoon({ isOpen: true, type: 'journal' });
+      window.history.replaceState(null, '', '#journal');
+      return;
+    }
+    if (cleanHash === 'stores' || cleanHash === 'store' || cleanHash === 'store-locator') {
+      setComingSoon({ isOpen: true, type: 'stores' });
+      window.history.replaceState(null, '', '#stores');
+      return;
+    }
+    if (cleanHash === 'admin') {
+      setAdminOpen(true);
+      window.history.replaceState(null, '', '#admin');
+      return;
+    }
+    if (target === '#' || cleanHash === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.history.replaceState(null, '', window.location.pathname);
+      return;
+    }
+
+    let targetId = cleanHash;
+    if (cleanHash === 'story' || cleanHash === 'about') targetId = 'philosophy';
+    if (cleanHash === 'science' || cleanHash === 'cellular-science' || cleanHash === 'french-alpine-actives') targetId = 'science';
+    if (cleanHash === 'shop') targetId = 'shop';
+
+    const element =
+      document.getElementById(targetId) ||
+      document.getElementById(cleanHash) ||
+      document.querySelector(target);
+
+    if (element) {
+      const offset = 80;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const offsetPosition = elementRect - bodyRect - offset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+      window.history.replaceState(null, '', `#${cleanHash}`);
+    }
+  };
+
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        setIntroFinished(true);
+        setLandingVisible(true);
+        handleNavigate(hash);
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    if (window.location.hash) {
+      setIntroFinished(true);
+      setLandingVisible(true);
+      setTimeout(handleHash, 100);
+      setTimeout(handleHash, 450);
+    }
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
 
   const handleOpenProduct = (product) => {
     if (!product) return;
@@ -177,6 +257,7 @@ export default function App() {
           onOpenSearch={() => setSearchOpen(true)}
           onOpenAccount={() => setAccountOpen(true)}
           introFinished={introFinished}
+          onNavigate={handleNavigate}
         />
 
         <main id="main-content">
@@ -196,6 +277,9 @@ export default function App() {
           {/* Editorial Split-Screen Brand Philosophy Section */}
           <PhilosophySection />
 
+          {/* French Alpine Actives & Cellular Science Section */}
+          <ScienceSection />
+
           {/* Interactive Our Values Tabbed Showcase Section */}
           <ValuesSection />
 
@@ -204,7 +288,7 @@ export default function App() {
         </main>
 
         {/* Luxury Footer */}
-        <Footer />
+        <Footer onNavigate={handleNavigate} />
       </div>
 
       {/* Mobile Sticky Quick Add Dock */}
@@ -340,6 +424,30 @@ export default function App() {
         onClearCart={() => setCartItems([])}
         onOpenStore={() => {
           setCheckoutOpen(false);
+        }}
+      />
+
+      {/* Editorial Coming Soon Modal (The Journal & Store Locator) */}
+      <EditorialComingSoon
+        isOpen={comingSoon.isOpen}
+        onClose={() => {
+          setComingSoon({ ...comingSoon, isOpen: false });
+          if (window.location.hash === '#journal' || window.location.hash === '#stores') {
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        }}
+        type={comingSoon.type}
+        onGoToShop={() => handleNavigate('#shop')}
+      />
+
+      {/* Boutique Operations & Admin Dashboard Modal */}
+      <AdminDashboard
+        isOpen={adminOpen}
+        onClose={() => {
+          setAdminOpen(false);
+          if (window.location.hash === '#admin') {
+            window.history.replaceState(null, '', window.location.pathname);
+          }
         }}
       />
     </div>

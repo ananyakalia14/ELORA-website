@@ -99,7 +99,14 @@ export default function CartDrawer({
               {items.map((item) => (
                 <div key={item.id} className="cart-item-card">
                   <div className="cart-item-thumb">
-                    <img src={item.image} alt={item.name} />
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = '/images/elora-hero-serum.jpg';
+                      }}
+                    />
                   </div>
                   <div className="cart-item-info">
                     <div className="cart-item-header-row">
@@ -166,7 +173,14 @@ export default function CartDrawer({
                 {availableCrossSells.slice(0, 3).map((cs) => (
                   <div key={cs.id} className="cross-sell-card">
                     <div className="cross-sell-thumb">
-                      <img src={cs.image} alt={cs.name} />
+                      <img
+                        src={cs.image}
+                        alt={cs.name}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/images/peptide-lip-tint-balm.jpg';
+                        }}
+                      />
                     </div>
                     <div className="cross-sell-details">
                       <p className="cross-sell-name">{cs.name}</p>

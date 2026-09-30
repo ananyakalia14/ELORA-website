@@ -212,7 +212,7 @@ export const PRODUCTS = [
     isHero: false,
     description:
       'A cushiony, peptide-rich glaze treatment that restores dry lips, boosts natural volume, and locks in dewy hydration with a high-shine satin gleam.',
-    image: '/images/elora-lip-glaze.jpg',
+    image: '/images/peptide-lip-tint-balm.jpg',
     secondaryImage: '/images/elora-hero-skin.jpg',
     variants: [
       {
@@ -221,7 +221,7 @@ export const PRODUCTS = [
         size: '10ml',
         price: 24,
         colorHex: '#A37E6F',
-        image: '/images/elora-lip-glaze.jpg'
+        image: '/images/peptide-lip-tint-balm.jpg'
       },
       {
         id: 'lip-rose',
@@ -229,7 +229,7 @@ export const PRODUCTS = [
         size: '10ml',
         price: 24,
         colorHex: '#CC918F',
-        image: '/images/elora-lip-rose.jpg'
+        image: '/images/peptide-lip-tint-balm.jpg'
       },
       {
         id: 'lip-clear',
@@ -237,7 +237,7 @@ export const PRODUCTS = [
         size: '10ml',
         price: 24,
         colorHex: '#E8D5BC',
-        image: '/images/elora-lip-clear.jpg'
+        image: '/images/peptide-lip-tint-balm.jpg'
       }
     ],
     keyActives: [
@@ -263,7 +263,7 @@ export const CROSS_SELL_PRODUCTS = [
     name: 'Peptide Lip Tint',
     variantName: 'Soft Taupe Clay',
     price: 24,
-    image: '/images/elora-lip-glaze.jpg',
+    image: '/images/peptide-lip-tint-balm.jpg',
     volume: '10ml'
   },
   {

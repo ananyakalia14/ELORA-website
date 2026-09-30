@@ -42,13 +42,12 @@ export default function ProductSection({ onAddToCart, onQuickView }) {
             className="section-title"
             style={{
               fontFamily: "var(--font-serif-display, 'Italiana', 'Cormorant Garamond', Georgia, serif)",
-              fontSize: 'clamp(1.35rem, 3.6vw, 3.3rem)',
+              fontSize: 'clamp(1.4rem, 3.6vw, 3.3rem)',
               lineHeight: 1.2,
               fontWeight: 400,
               color: '#2E1A16',
               margin: '0 auto 1.4rem auto',
               maxWidth: '100%',
-              whiteSpace: 'nowrap',
               letterSpacing: '-0.01em',
               textAlign: 'center',
             }}

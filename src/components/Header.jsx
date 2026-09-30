@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Search, User, ShoppingBag, X } from 'lucide-react';
+import { Search, User, ShoppingBag, X, Menu, ArrowRight } from 'lucide-react';
 import EloraLogo from './EloraLogo';
 
 /**
  * Élora Transparent Navigation Header
- * Left Zone:   SHOP • ABOUT • JOURNAL
+ * Left Zone:   SHOP • ABOUT • JOURNAL (Desktop) / Hamburger Menu (Mobile)
  * Center Zone: Centered Élora Logo (id="header-logo-slot")
  * Right Zone:  SEARCH • ACCOUNT • BAG (N)
  */
@@ -17,6 +17,7 @@ export default function Header({
   onNavigate,
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,9 +53,17 @@ export default function Header({
         className={`site-header elora-header ${isScrolled ? 'is-scrolled' : ''}`}
         id="main-site-header"
       >
-        {/* Left Zone: SHOP, ABOUT, JOURNAL */}
+        {/* Left Zone: SHOP, ABOUT, JOURNAL (Desktop) & Menu Toggle (Mobile) */}
         <div className="header-left">
-          <nav className="header-nav-left" aria-label="Primary Navigation">
+          <button
+            className="header-mobile-menu-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+
+          <nav className="header-nav-left desktop-only" aria-label="Primary Navigation">
             <a
               href="#shop"
               onClick={(e) => scrollToSection(e, '#shop')}
@@ -70,8 +79,8 @@ export default function Header({
               ABOUT
             </a>
             <a
-              href="#press"
-              onClick={(e) => scrollToSection(e, '#press')}
+              href="#journal"
+              onClick={(e) => scrollToSection(e, '#journal')}
               className="header-nav-link"
             >
               JOURNAL
@@ -158,6 +167,75 @@ export default function Header({
           </button>
         </div>
       </header>
+
+      {/* Luxury Full-Screen Mobile Drawer */}
+      {mobileMenuOpen && (
+        <div className="elora-mobile-nav-drawer" role="dialog" aria-modal="true">
+          <div className="elora-mobile-nav-inner">
+            <div className="elora-mobile-nav-header">
+              <span className="elora-mobile-nav-tag">ÉLORA DIRECTORY</span>
+              <button
+                className="elora-mobile-nav-close"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close menu"
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            <nav className="elora-mobile-nav-links">
+              {[
+                { label: 'Shop The Collection', href: '#shop', desc: 'Five essentials, one signature glow' },
+                { label: 'Our Story & Philosophy', href: '#story', desc: 'French botanical tradition & cellular science' },
+                { label: 'French Alpine Actives', href: '#science', desc: 'Sub-zero cryo-distilled Alpine Rose stem cells' },
+                { label: 'Cellular Science', href: '#science', desc: '5-tier oligo molecular delivery' },
+                { label: 'The Journal', href: '#journal', desc: 'Inaugural Volume I • Essays & ritual guides' },
+                { label: 'Store Locator', href: '#stores', desc: 'Paris, New York, Tokyo flagships' },
+                { label: 'Atelier Admin', href: '#admin', desc: 'Boutique inventory & order fulfillment' },
+              ].map((link, idx) => (
+                <a
+                  key={idx}
+                  href={link.href}
+                  className="elora-mobile-nav-item"
+                  onClick={(e) => {
+                    setMobileMenuOpen(false);
+                    scrollToSection(e, link.href);
+                  }}
+                >
+                  <div className="elora-mobile-nav-item-text">
+                    <span className="elora-mobile-nav-title">{link.label}</span>
+                    <span className="elora-mobile-nav-desc">{link.desc}</span>
+                  </div>
+                  <ArrowRight size={16} className="elora-mobile-nav-arrow" />
+                </a>
+              ))}
+            </nav>
+
+            <div className="elora-mobile-nav-footer">
+              <button
+                className="elora-mobile-nav-action-btn"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenSearch();
+                }}
+              >
+                <Search size={16} />
+                <span>Search Products</span>
+              </button>
+              <button
+                className="elora-mobile-nav-action-btn"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenAccount();
+                }}
+              >
+                <User size={16} />
+                <span>Client Account</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

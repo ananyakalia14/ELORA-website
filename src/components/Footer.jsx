@@ -32,7 +32,7 @@ export default function Footer({ onNavigate, variant }) {
 
   return (
     <footer
-      className={`elora-footer ${isAccount ? 'elora-footer-account' : 'bg-[#F9F6F0]'} text-[#3A2E2B] w-full overflow-hidden`}
+      className={`elora-footer ${isAccount ? 'elora-footer-account' : 'bg-[#F9F6F0]'} text-[#3A2E2B] w-full overflow-hidden pb-20 md:pb-0`}
       role="contentinfo"
       aria-label="Site Footer"
     >
@@ -41,7 +41,7 @@ export default function Footer({ onNavigate, variant }) {
         <h2
           className="elora-giant-wordmark w-full text-center font-serif uppercase text-[#3A2E2B] font-normal tracking-[-0.04em] leading-[0.78] whitespace-nowrap pointer-events-none"
           style={{
-            fontSize: 'clamp(100px, 24vw, 360px)',
+            fontSize: 'clamp(54px, 22vw, 360px)',
             fontFamily: "var(--font-serif-display, 'Italiana', 'Cormorant Garamond', 'Didot', Georgia, serif)",
             fontWeight: 400,
             textTransform: 'uppercase',
@@ -148,6 +148,7 @@ export default function Footer({ onNavigate, variant }) {
                 { label: 'Cellular Science', href: '#science' },
                 { label: 'The Journal', href: '#journal' },
                 { label: 'Store Locator', href: '#stores' },
+                { label: 'Atelier Admin', href: '#admin' },
               ].map((link, idx) => (
                 <li key={idx}>
                   <a

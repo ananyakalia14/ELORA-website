@@ -34,6 +34,7 @@ export default function PhilosophySection() {
       className="philosophy-section bg-[#F9F6F0] w-full min-h-[80vh] grid grid-cols-1 lg:grid-cols-2 items-center overflow-hidden relative"
       aria-label="The Élora Philosophy"
     >
+      <div id="story" style={{ position: 'absolute', top: 0, height: 1, width: 1, pointerEvents: 'none' }} />
       {/* 2. LEFT COLUMN: Hand with Heart Cream Swatch & Seamless Mask Merge */}
       <div className="philosophy-media-col relative w-full h-[380px] sm:h-[480px] lg:h-full lg:min-h-[80vh] flex items-center justify-center overflow-hidden bg-[#F9F6F0]">
         {/* Hand Holding Heart Cream Image - Positioned to the left so the full hand & heart swatch are visible */}

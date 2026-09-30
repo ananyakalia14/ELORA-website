@@ -26,24 +26,9 @@ export default function ValuesSection() {
         overflow: 'hidden'
       }}
     >
-      <div 
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          width: '100%',
-          minHeight: '620px'
-        }}
-      >
+      <div className="elora-values-grid">
         {/* LEFT 50% COLUMN */}
-        <div 
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: 'clamp(32px, 6vw, 80px)',
-            boxSizing: 'border-box'
-          }}
-        >
+        <div className="elora-values-left-col">
           {/* Top: Dynamic Statement + Badge */}
           <div>
             {/* Dynamic Text Container - Generous minHeight with visible overflow so text is NEVER hidden */}
@@ -134,16 +119,7 @@ export default function ValuesSection() {
         </div>
 
         {/* RIGHT 50% COLUMN - LOCKED IMAGE CONTAINER */}
-        <div 
-          style={{
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-            minHeight: '620px',
-            backgroundColor: '#FAF6F0',
-            overflow: 'hidden'
-          }}
-        >
+        <div className="elora-values-right-col">
           <img 
             src="/images/elora-bottles.jpg"
             alt="Élora Skincare Collection"
