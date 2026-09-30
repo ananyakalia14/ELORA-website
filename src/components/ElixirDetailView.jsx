@@ -19,7 +19,8 @@ const ELIXIR_VARIANTS = [
     description: 'A whipped, translucent berry-pink tint with barrier-strengthening dew for a glass-skin glazed flush.',
     colorHex: '#E6A8B4',
     gradient: 'radial-gradient(circle at 35% 35%, #FAD2DB 0%, #E6A8B4 55%, #CF8795 100%)',
-    image: '/images/products/elixir-packshot.jpg',
+    image: '/images/rose-mousse.png',
+    fallbackImage: '/Rosé Mousse.png',
     badge: 'ÉLORA SIGNATURE',
   },
   {
@@ -30,8 +31,21 @@ const ELIXIR_VARIANTS = [
     description: 'A warm toasted marshmallow bronze tint with sun-drenched radiance and deep barrier-repair lipids.',
     colorHex: '#9B6247',
     gradient: 'radial-gradient(circle at 35% 35%, #BD7F62 0%, #9B6247 55%, #76432D 100%)',
-    image: '/images/products/elixir-dropper.jpg',
+    image: '/images/teddytoast.png',
+    fallbackImage: '/teddytoast.png',
     badge: 'ICONIC BRONZE',
+  },
+  {
+    id: 'guava-spritz',
+    name: 'Guava Spritz',
+    code: '03',
+    subtitle: 'baume teinté corail exotique',
+    description: 'A sunlit tropical guava coral tint infused with passion-fruit antioxidants for a vibrant, juicy glass flush.',
+    colorHex: '#E7706B',
+    gradient: 'radial-gradient(circle at 35% 35%, #FFA099 0%, #E7706B 55%, #C24B46 100%)',
+    image: '/images/guavablush.png',
+    fallbackImage: '/guavablush.png',
+    badge: 'NEW ARRIVAL',
   },
 ];
 
@@ -153,6 +167,11 @@ export default function ElixirDetailView({
           src={selectedVariant.image}
           alt={`Élora The Glazed Barrier Elixir ${selectedVariant.name}`}
           className="elora-shade-pdp-bg"
+          onError={(e) => {
+            if (selectedVariant.fallbackImage && e.currentTarget.src !== selectedVariant.fallbackImage) {
+              e.currentTarget.src = selectedVariant.fallbackImage;
+            }
+          }}
           style={{
             position: 'absolute',
             inset: 0,

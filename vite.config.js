@@ -6,7 +6,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     watch: {
-      ignored: ['**/*.mp4', '**/*.avi', '**/*.mov', '**/*.ico']
+      usePolling: true,
+      interval: 1000,
+      ignored: ['**/*.mp4', '**/*.avi', '**/*.mov', '**/*.ico', '**/*.png', '**/*.jpg', '**/*.jpeg']
     }
   }
 })

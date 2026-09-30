@@ -111,6 +111,15 @@ export default function ProductCarousel({
             key={item.id}
             className="elora-carousel-card"
             onClick={() => onQuickView && onQuickView(item)}
+            role="button"
+            tabIndex={0}
+            aria-label={`View details for ${item.name}`}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (onQuickView) onQuickView(item);
+              }
+            }}
           >
             {/* Edge-to-Edge Media Card: No outer box panels, texts on image itself */}
             <div className="elora-card-media-canvas">
