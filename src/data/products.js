@@ -56,6 +56,47 @@ export const PRODUCTS = [
       'Warm 3–4 drops between palms. Press gently into cleansed damp skin morning and night, sweeping upwards along jawline and cheekbones.'
   },
   {
+    id: 'glazing-milk',
+    name: 'Glazing Milk Essence',
+    category: 'Essences',
+    subtitle: 'Lait Glacé Micro-Infusion',
+    price: 115,
+    volume: '140 ml / 4.7 fl oz',
+    rating: 5.0,
+    reviewsCount: 189,
+    badge: 'Bestseller',
+    isHero: false,
+    isGlazingMilk: true,
+    description:
+      'A nutrient-dense, micro-emulsified ceramide facial essence designed to drench skin in barrier-strengthening dew for an immediate glazed, glass-skin gleam.',
+    image: '/images/glazing-milk-martini.jpg',
+    secondaryImage: '/images/elora-glazing-milk.jpg',
+    variants: [
+      {
+        id: 'milk-standard',
+        name: 'Standard Reserve (140ml)',
+        size: '140ml',
+        price: 115,
+        colorHex: '#F6F0E8',
+        image: '/images/glazing-milk-martini.jpg'
+      }
+    ],
+    keyActives: [
+      'French Alpine Rose Stem Cells',
+      'Micronized Ceramide Tri-Complex (NP, AP, EOP)',
+      '5-Tier Oligo Hyaluronic Acid',
+      'Cold-Pressed Botanical Squalane'
+    ],
+    clinicalMetrics: [
+      { label: 'measured continuous 24-hr locked moisture', value: '98%' },
+      { label: 'reported instant dewy glass-skin radiance', value: '94%' },
+      { label: 'confirmed reduction in redness & sensitivity', value: '91%' }
+    ],
+    texture: 'Lightweight milky micro-emulsion that melts into a glassy, drenching dew with zero tackiness.',
+    ritual:
+      'Shake gently. Splash 3–5 drops into warm palms and press into cleansed face, neck, and décolletage before serums.'
+  },
+  {
     id: 'creme-lumineuse',
     name: 'Crème Lumineuse',
     category: 'Moisturizers',

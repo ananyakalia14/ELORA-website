@@ -14,12 +14,17 @@ export default function HeroSection({ onShopHero }) {
           Replace '/images/hero-model.jpg' with your custom model/lifestyle photograph
           ========================================================================== */}
       <div className="elora-hero-media-wrap">
-        <img
-          src="/images/hero-model.jpg"
-          alt="Élora Skincare Campaign"
-          className="elora-hero-image"
-          loading="eager"
-        />
+        <picture className="elora-hero-picture">
+          <source media="(max-width: 768px)" srcSet="/images/glazing-milk-martini-mobile.jpg" />
+          <source media="(max-width: 1024px)" srcSet="/images/glazing-milk-martini-tablet.jpg" />
+          <img
+            src="/images/glazing-milk-martini.jpg"
+            alt="Élora Glazing Milk Campaign"
+            className="elora-hero-image"
+            loading="eager"
+            fetchPriority="high"
+          />
+        </picture>
         {/* Soft editorial gradient scrim for optimal typography legibility */}
         <div className="elora-hero-scrim" />
       </div>

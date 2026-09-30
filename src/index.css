@@ -562,13 +562,16 @@ h1, h2, h3, h4, .font-serif {
 .elora-full-bleed-hero {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  aspect-ratio: 16 / 9;
+  min-height: min(100vh, 56.25vw);
+  max-height: 94vh;
   display: flex;
   align-items: flex-end;
   overflow: hidden;
   margin-top: calc(-1 * var(--header-height));
   padding-top: var(--header-height);
-  background-color: var(--color-bg);
+  background-color: #F9F6F0;
+  box-sizing: border-box;
 }
 
 .elora-hero-media-wrap {
@@ -579,32 +582,26 @@ h1, h2, h3, h4, .font-serif {
   z-index: 1;
 }
 
+.elora-hero-picture {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 .elora-hero-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 70% center;
+  object-position: center center; /* center center on desktop */
   display: block;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    #000 0%,
-    #000 62%,
-    rgba(0, 0, 0, 0.92) 72%,
-    rgba(0, 0, 0, 0.58) 84%,
-    rgba(0, 0, 0, 0.18) 94%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    #000 0%,
-    #000 62%,
-    rgba(0, 0, 0, 0.92) 72%,
-    rgba(0, 0, 0, 0.58) 84%,
-    rgba(0, 0, 0, 0.18) 94%,
-    transparent 100%
-  );
+  image-rendering: auto;
+  border: none;
+  outline: none;
+  filter: none !important;
+  transform: none !important;
 }
 
+/* Subtle, delicate scrim preserving campaign photo fidelity while ensuring text contrast */
 .elora-hero-scrim {
   position: absolute;
   inset: 0;
@@ -612,42 +609,102 @@ h1, h2, h3, h4, .font-serif {
     /* Gentle top fade for transparent header legibility */
     linear-gradient(
       to bottom,
-      rgba(249, 246, 240, 0.5) 0%,
-      rgba(249, 246, 240, 0.12) 16%,
-      rgba(249, 246, 240, 0) 30%
+      rgba(249, 246, 240, 0.45) 0%,
+      rgba(249, 246, 240, 0.1) 16%,
+      transparent 28%
     ),
-    /* Soft left scrim behind editorial typography */
+    /* Soft right scrim to support editorial typography in the open space */
     linear-gradient(
-      to right,
-      rgba(249, 246, 240, 0.5) 0%,
-      rgba(249, 246, 240, 0.2) 35%,
-      rgba(249, 246, 240, 0) 65%
+      to left,
+      rgba(249, 246, 240, 0.6) 0%,
+      rgba(249, 246, 240, 0.25) 30%,
+      transparent 55%
     ),
-    /* Silky continuous bottom gradient melting into #F9F6F0 */
+    /* Delicate bottom seam melting into the page background */
     linear-gradient(
-      to bottom,
-      rgba(249, 246, 240, 0) 60%,
-      rgba(249, 246, 240, 0.08) 70%,
-      rgba(249, 246, 240, 0.28) 80%,
-      rgba(249, 246, 240, 0.62) 90%,
-      rgba(249, 246, 240, 0.9) 97%,
-      var(--color-bg) 100%
+      to top,
+      #F9F6F0 0%,
+      rgba(249, 246, 240, 0.7) 4%,
+      transparent 14%
     );
   pointer-events: none;
+  z-index: 2;
 }
 
 .elora-hero-content-overlay {
   position: relative;
   z-index: 5;
   width: 100%;
-  padding: 0 4vw 4.5rem 4vw;
-  max-width: 1440px;
+  padding: 0 5vw 4rem 5vw;
+  max-width: 1480px;
   margin: 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  box-sizing: border-box;
 }
 
 .elora-hero-content-inner {
-  max-width: 580px;
+  max-width: 520px;
+  text-align: left;
 }
+
+@media (max-width: 1024px) {
+  .elora-full-bleed-hero {
+    aspect-ratio: auto;
+    min-height: 75vh;
+    min-height: 75dvh;
+    max-height: none;
+  }
+
+  .elora-hero-image {
+    object-position: center center;
+  }
+
+  .elora-hero-content-overlay {
+    justify-content: flex-start;
+    padding: 0 1.75rem 3rem 1.75rem;
+  }
+
+  .elora-hero-content-inner {
+    max-width: 480px;
+    background: rgba(250, 246, 240, 0.68);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 1.5rem 1.75rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+  }
+}
+
+@media (max-width: 768px) {
+  .elora-full-bleed-hero {
+    aspect-ratio: auto;
+    min-height: 84vh;
+    min-height: 84dvh;
+    max-height: none;
+  }
+
+  /* Uses separate mobile crop (glazing-milk-martini-mobile.jpg) */
+  .elora-hero-image {
+    object-position: center 15%;
+    object-fit: cover;
+  }
+
+  .elora-hero-content-overlay {
+    padding: 0 1.25rem 2rem 1.25rem;
+  }
+
+  .elora-hero-content-inner {
+    max-width: 100%;
+    padding: 1.25rem 1.25rem;
+    border-radius: 18px;
+  }
+
+  .elora-hero-headline {
+    font-size: clamp(2.2rem, 8vw, 2.9rem);
+  }
+}
+
 
 .elora-eyebrow-tag {
   font-size: 0.74rem;
@@ -4022,14 +4079,14 @@ h1, h2, h3, h4, .font-serif {
   animation: pageFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Hero Section Container (Full-screen editorial hero with IV pouch baked into background) */
+/* Hero Section Container (Full-screen editorial hero with clean sunlit wall) */
 .elora-account-hero-wrap {
   position: relative;
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
   background-color: #D0B5A3;
-  background-image: url('/images/elora-account-hero-bg.jpg');
+  background-image: url('/images/elora-account-wall-bg.jpg');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
@@ -4091,7 +4148,7 @@ h1, h2, h3, h4, .font-serif {
   color: #3A2E2B !important;
 }
 
-/* 2. Main Hero Layout — form floats on the right over the wall background */
+/* 2. Main Hero Layout — IV pouch on the left, floating form on the right */
 .elora-account-page-body {
   flex: 1 0 auto;
   width: 100%;
@@ -4107,12 +4164,12 @@ h1, h2, h3, h4, .font-serif {
   gap: 1rem;
 }
 
-/* Left Hero Column: empty on desktop — the pouch is in the background image */
+/* Left Hero Column: displays the new IV infusion pouch prominently */
 .elora-account-hero-col {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 1rem;
 }
 
 .elora-account-pouch-frame {
@@ -4123,30 +4180,30 @@ h1, h2, h3, h4, .font-serif {
   max-width: 520px;
 }
 
-/* On desktop the pouch is part of the photographic background — hide the HTML element */
+/* On desktop, the IV pouch and sunlit wall are seamlessly composed in the background image */
 @media (min-width: 1025px) {
   .elora-account-pouch-hero-img {
     display: none !important;
   }
 }
 
-/* Mobile fallback: show the pouch as a standalone element */
+/* Mobile fallback: show the pouch as a standalone element stacked above the form */
 .elora-account-pouch-hero-img {
-  max-height: 300px;
-  max-width: 260px;
+  max-height: 290px;
+  max-width: 240px;
   width: auto;
   height: auto;
   object-fit: contain;
   display: block;
   margin: 0 auto;
   border-radius: 0;
-  mix-blend-mode: multiply;
-  filter: none;
-  transition: transform 0.4s ease;
+  filter: drop-shadow(0 12px 24px rgba(58, 46, 43, 0.14));
+  transition: transform 0.4s ease, filter 0.4s ease;
 }
 
 .elora-account-pouch-hero-img:hover {
-  transform: scale(1.015);
+  transform: translateY(-3px) scale(1.02);
+  filter: drop-shadow(0 16px 30px rgba(58, 46, 43, 0.2));
 }
 
 /* Right Form Column: Floating Sanctuary directly on sunlit wall */
@@ -4583,14 +4640,14 @@ h1, h2, h3, h4, .font-serif {
 
   .elora-account-pouch-hero-img {
     display: block !important;
-    max-height: 300px;
-    max-width: 260px;
+    max-height: 290px;
+    max-width: 240px;
     width: auto;
     height: auto;
     object-fit: contain;
     border-radius: 0;
-    filter: none;
-    mix-blend-mode: multiply;
+    filter: drop-shadow(0 12px 24px rgba(58, 46, 43, 0.14));
+    animation: none;
   }
 
   .elora-account-portal-card {
@@ -4632,8 +4689,227 @@ h1, h2, h3, h4, .font-serif {
   cursor: pointer;
 }
 
+/* ==========================================================================
+   FULL-SCREEN PRODUCT DETAIL VIEW (GLAZING MILK ESSENCE)
+   ========================================================================== */
+
+@keyframes pdpFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.elora-pdp-root {
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 9999 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  overflow: hidden !important;
+  background-color: #F9F6F0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  animation: pdpFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.elora-pdp-buy-card::-webkit-scrollbar {
+  width: 4px;
+}
+.elora-pdp-buy-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+.elora-pdp-buy-card::-webkit-scrollbar-thumb {
+  background: rgba(170, 119, 106, 0.35);
+  border-radius: 999px;
+}
+
+@media (max-width: 768px) {
+  .elora-pdp-header {
+    padding: 1rem 1.25rem !important;
+  }
+  .elora-pdp-card-stage {
+    padding: 0 1rem 1.5rem 1rem !important;
+    justify-content: center !important;
+    align-items: flex-end !important;
+  }
+  .elora-pdp-buy-card {
+    max-width: 100% !important;
+    padding: 1.5rem 1.25rem !important;
+    border-radius: 22px !important;
+    max-height: calc(100vh - 85px) !important;
+    max-height: calc(100dvh - 85px) !important;
+  }
+}
+
+
 .elora-footer-concierge-link:hover {
   color: #3A2E2B !important;
   text-decoration-color: rgba(58, 46, 43, 1) !important;
 }
+
+/* ==========================================================================
+   EXPANDABLE SHADES PILL BUTTON & INTERACTIVE SHADE MODAL
+   ========================================================================== */
+
+/* 1. Expandable Button */
+.elora-expandable-shade-btn,
+button.h-11.w-11.rounded-full {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 999px;
+  background-color: #3A2E2B;
+  color: #FAF6F0;
+  border: 1px solid rgba(58, 46, 43, 0.25);
+  box-shadow: 0 4px 16px rgba(58, 46, 43, 0.16);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: width 300ms cubic-bezier(0.16, 1, 0.3, 1), background-color 200ms ease, box-shadow 200ms ease;
+  cursor: pointer;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.elora-expandable-shade-btn:hover,
+button.h-11.w-11.rounded-full:hover,
+.hover\:w-36:hover {
+  width: 144px !important;
+  background-color: #271C19;
+  box-shadow: 0 6px 22px rgba(58, 46, 43, 0.24);
+}
+
+.elora-shade-btn-label,
+.group .opacity-0.tracking-widest {
+  opacity: 0;
+  transform: translateX(12px);
+  transition: opacity 220ms ease, transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  white-space: nowrap;
+  color: #FAF6F0;
+  user-select: none;
+}
+
+.elora-expandable-shade-btn:hover .elora-shade-btn-label,
+.group:hover .group-hover\:-translate-x-3,
+.group:hover .group-hover\:opacity-100,
+button.h-11.w-11:hover span {
+  opacity: 1 !important;
+  transform: translateX(-12px) !important;
+}
+
+.elora-shade-btn-icon,
+.right-3\.5 {
+  position: absolute;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FAF6F0;
+  transition: transform 250ms ease;
+}
+
+.elora-expandable-shade-btn:hover .elora-shade-btn-icon,
+button.h-11.w-11:hover .right-3\.5 {
+  transform: translateX(2px);
+}
+
+/* 2. Shade Drawer / Popup Overlay */
+.elora-shade-modal-overlay,
+.fixed.inset-0.z-50.bg-black\/40 {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100000 !important;
+  background: rgba(18, 12, 10, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1.25rem !important;
+  animation: pdpFadeIn 0.25s ease-out forwards;
+}
+
+.elora-shade-modal-card,
+.max-w-lg.bg-\[\#FAF6F0\] {
+  width: 100% !important;
+  max-width: 480px !important;
+  background-color: #FAF6F0 !important;
+  border-radius: 28px !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  padding: 2.2rem 2.2rem !important;
+  box-shadow: 0 25px 65px rgba(26, 17, 15, 0.28) !important;
+  position: relative !important;
+  color: #3A2E2B !important;
+  box-sizing: border-box !important;
+  animation: pdpFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 3. Swatch Ring and Active States */
+.ring-1,
+.ring-\[\#3A2E2B\] {
+  box-shadow: 0 0 0 1.5px #3A2E2B !important;
+}
+
+.scale-105 {
+  transform: scale(1.08) !important;
+}
+
+.hover\:opacity-80:hover {
+  opacity: 0.8;
+}
+
+.w-10 {
+  width: 40px !important;
+}
+
+.h-10 {
+  height: 40px !important;
+}
+
+.shadow-inner {
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2), inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.6) !important;
+}
+
+.border-black\/5 {
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Specular curved reflection highlight on swatch circles matching reference image */
+.elora-swatch-drop {
+  position: relative;
+  overflow: hidden;
+}
+
+.elora-swatch-drop::after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 9px;
+  height: 5px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.72);
+  transform: rotate(-30deg);
+  filter: blur(0.35px);
+  pointer-events: none;
+}
+
+
 

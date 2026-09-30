@@ -204,7 +204,7 @@ export default function AccountPage({
                 alt="Élora Skin Nutrition Intravenously Optimised"
                 className="elora-account-pouch-hero-img"
                 onError={(e) => {
-                  e.currentTarget.src = '/images/elora-account-user-bg.png';
+                  e.currentTarget.src = '/images/elora-new-pouch-raw.png';
                 }}
               />
             </div>

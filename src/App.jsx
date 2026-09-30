@@ -5,6 +5,7 @@ import Header from './components/Header';
 import HeroSection from './components/HeroSection';
 import ProductSection from './components/ProductSection';
 import ProductModal from './components/ProductModal';
+import GlazingMilkDetailView from './components/GlazingMilkDetailView';
 import PhilosophySection from './components/PhilosophySection';
 import ValuesSection from './components/ValuesSection';
 import PressSection from './components/PressSection';
@@ -31,6 +32,23 @@ export default function App() {
 
   // Modal quick view state
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [glazingMilkViewOpen, setGlazingMilkViewOpen] = useState(false);
+
+  const handleOpenProduct = (product) => {
+    if (!product) return;
+    const isGlazingMilk =
+      product.isGlazingMilk ||
+      product.id === 'glazing-milk' ||
+      product.id === 'lumineuse' ||
+      (product.name && product.name.toLowerCase().includes('glazing')) ||
+      (product.name && product.name.toLowerCase().includes('milk'));
+
+    if (isGlazingMilk) {
+      setGlazingMilkViewOpen(true);
+    } else {
+      setSelectedProduct(product);
+    }
+  };
 
   const handleTransitionStart = () => {
     setLandingVisible(true);
@@ -129,7 +147,7 @@ export default function App() {
           {/* Curated Botanical Edit with Shade/Variant Swatches */}
           <ProductSection
             onAddToCart={handleAddToCart}
-            onQuickView={(p) => setSelectedProduct(p)}
+            onQuickView={handleOpenProduct}
           />
 
 
@@ -159,12 +177,24 @@ export default function App() {
         />
       )}
 
+      {/* Full-Screen Glazing Milk Detail View */}
+      <GlazingMilkDetailView
+        isOpen={glazingMilkViewOpen}
+        onClose={() => setGlazingMilkViewOpen(false)}
+        onAddToCart={handleAddToCart}
+        onOpenCart={() => {
+          setGlazingMilkViewOpen(false);
+          setCartOpen(true);
+        }}
+        cartCount={totalCartCount}
+      />
+
       {/* Slide-out Rhode-Style Search Drawer */}
       <SearchDrawer
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
         onSelectProduct={(product) => {
-          setSelectedProduct(product);
+          handleOpenProduct(product);
           setSearchOpen(false);
         }}
         onAddToCart={handleAddToCart}

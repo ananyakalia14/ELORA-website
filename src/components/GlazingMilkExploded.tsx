@@ -3,15 +3,11 @@ import React, { useEffect, useRef } from 'react';
 /**
  * GlazingMilkExploded Video Section
  * 
- * Requirements:
- * 1. Expanded video stage with seamless background merging (no floating box or isolated oval).
- *    Section background matches the video's warm silk tones and smoothly dissolves into page cream above and below.
- * 2. Reduced vertical space below the video and above the product carousel (no wasted space).
- * 3. Plays automatically when user scrolls into view.
- * 4. Pauses automatically when user scrolls away.
- * 5. Plays again whenever the user scrolls back to this part of the screen.
- * 6. Sound is ON (unmuted, volume=1.0) with seamless gesture-based browser autoplay policy handling.
- * 7. Completely clean: zero badges, zero controls, zero pause/mute buttons.
+ * Features:
+ * 1. Automatic playback as soon as the user scrolls into view ("when I reach here").
+ * 2. Pauses gracefully when scrolled away to preserve performance.
+ * 3. Fully dissolved, feathered borders on all sides — eliminates all sharp rectangular video cutoffs.
+ * 4. Multi-layer vignette and perimeter gradient dissolves that seamlessly blend the video into the warm silk backdrop.
  */
 export default function ExplodedGlazingMilkVideo() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -22,73 +18,87 @@ export default function ExplodedGlazingMilkVideo() {
     const container = containerRef.current;
     if (!video || !container) return;
 
-    // Ensure volume is 100%
-    video.volume = 1.0;
+    // Browser autoplay policy requires muted=true to start playing reliably
+    video.muted = true;
+    video.defaultMuted = true;
 
-    // Function to ensure audio is unmuted on any user activity
-    const enableAudio = () => {
-      if (videoRef.current) {
-        videoRef.current.muted = false;
-        videoRef.current.volume = 1.0;
+    const playVideo = () => {
+      if (!video) return;
+      video.muted = true;
+      if (video.ended) {
+        video.currentTime = 0;
+      }
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Retry muted if needed
+          video.muted = true;
+          video.play().catch(() => {});
+        });
       }
     };
 
-    const gestureEvents = ['click', 'touchstart', 'keydown', 'scroll', 'wheel', 'pointerdown'];
-    gestureEvents.forEach((evt) => {
-      window.addEventListener(evt, enableAudio, { passive: true });
-    });
+    const pauseVideo = () => {
+      if (video && !video.paused) {
+        video.pause();
+      }
+    };
 
-    // IntersectionObserver: plays when in view, pauses when out of view, replays when returning
+    // 1. IntersectionObserver: triggers as soon as the user reaches this section
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.15) {
-          // User is on this part of the screen -> play
-          if (video.ended) {
-            video.currentTime = 0;
-          }
-          video.muted = false;
-          video.volume = 1.0;
-          const playPromise = video.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(() => {
-              // If browser blocks unmuted autoplay without prior gesture,
-              // play muted first and immediately unmute on the very next movement/scroll
-              video.muted = true;
-              video.play().then(() => {
-                const unmuteOnce = () => {
-                  if (videoRef.current) {
-                    videoRef.current.muted = false;
-                    videoRef.current.volume = 1.0;
-                  }
-                  gestureEvents.forEach((e) => window.removeEventListener(e, unmuteOnce));
-                };
-                gestureEvents.forEach((e) => {
-                  window.addEventListener(e, unmuteOnce, { passive: true, once: true });
-                });
-              }).catch(() => {});
-            });
-          }
+        if (entry.isIntersecting) {
+          playVideo();
         } else {
-          // User scrolled away from this part of the screen -> pause
-          if (!video.paused) {
-            video.pause();
-          }
+          pauseVideo();
         }
       },
       {
-        threshold: [0, 0.15, 0.4, 0.7, 1.0],
+        root: null,
+        rootMargin: '80px 0px 80px 0px', // Pre-trigger slightly so it's already playing when reaching here
+        threshold: [0, 0.05, 0.15, 0.3],
       }
     );
 
     observer.observe(container);
 
+    // 2. Scroll listener fallback for instantaneous response on user reach
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (!container || !video) {
+            ticking = false;
+            return;
+          }
+          const rect = container.getBoundingClientRect();
+          const inViewport = rect.top < window.innerHeight * 0.85 && rect.bottom > window.innerHeight * 0.15;
+          if (inViewport) {
+            if (video.paused) {
+              playVideo();
+            }
+          } else {
+            if (!video.paused) {
+              pauseVideo();
+            }
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
+
+    // Initial check on load
+    handleScroll();
+
     return () => {
       observer.disconnect();
-      gestureEvents.forEach((evt) => {
-        window.removeEventListener(evt, enableAudio);
-      });
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
     };
   }, []);
 
@@ -98,27 +108,26 @@ export default function ExplodedGlazingMilkVideo() {
       className="glazing-milk-exploded-section"
       style={{
         position: 'relative',
-        // Background matches the video's exact warm silk tones (#D8C8B7 on left, #C6B39E on right, #E5DACD center)
         background: `
           radial-gradient(ellipse 90% 80% at 50% 55%, #E5DACD 0%, #DBCBBA 40%, #CFBDAA 75%, transparent 100%),
           linear-gradient(to right, #D8C8B7 0%, #E0D3C4 35%, #D7C6B3 65%, #C6B39E 100%)
         `,
-        padding: '3.5rem 0 0.5rem 0', // Compact bottom padding to eliminate dead space before cards
+        padding: '3.5rem 0 0.5rem 0',
         overflow: 'hidden',
         width: '100%',
       }}
     >
-      {/* Top transition: smoothly dissolves from page cream (#F9F6F0) into the silk atmosphere */}
+      {/* Top transition: smoothly dissolves from page cream (#F9F6F0) into silk atmosphere */}
       <div
         style={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
-          height: '140px',
-          background: 'linear-gradient(to bottom, #F9F6F0 0%, rgba(249, 246, 240, 0.7) 40%, transparent 100%)',
+          height: '160px',
+          background: 'linear-gradient(to bottom, #F9F6F0 0%, rgba(249, 246, 240, 0.8) 35%, rgba(249, 246, 240, 0) 100%)',
           pointerEvents: 'none',
-          zIndex: 3,
+          zIndex: 5,
         }}
       />
 
@@ -129,10 +138,10 @@ export default function ExplodedGlazingMilkVideo() {
           bottom: 0,
           left: 0,
           right: 0,
-          height: '120px',
-          background: 'linear-gradient(to top, #F9F6F0 0%, rgba(249, 246, 240, 0.7) 40%, transparent 100%)',
+          height: '130px',
+          background: 'linear-gradient(to top, #F9F6F0 0%, rgba(249, 246, 240, 0.8) 35%, rgba(249, 246, 240, 0) 100%)',
           pointerEvents: 'none',
-          zIndex: 3,
+          zIndex: 5,
         }}
       />
 
@@ -143,10 +152,10 @@ export default function ExplodedGlazingMilkVideo() {
           top: 0,
           bottom: 0,
           left: 0,
-          width: '160px',
-          background: 'linear-gradient(to right, #D8C8B7 0%, rgba(216, 200, 183, 0.6) 40%, transparent 100%)',
+          width: '180px',
+          background: 'linear-gradient(to right, #D8C8B7 0%, rgba(216, 200, 183, 0.7) 45%, transparent 100%)',
           pointerEvents: 'none',
-          zIndex: 3,
+          zIndex: 5,
         }}
       />
 
@@ -157,10 +166,10 @@ export default function ExplodedGlazingMilkVideo() {
           top: 0,
           bottom: 0,
           right: 0,
-          width: '160px',
-          background: 'linear-gradient(to left, #C6B39E 0%, rgba(198, 179, 158, 0.6) 40%, transparent 100%)',
+          width: '180px',
+          background: 'linear-gradient(to left, #C6B39E 0%, rgba(198, 179, 158, 0.7) 45%, transparent 100%)',
           pointerEvents: 'none',
-          zIndex: 3,
+          zIndex: 5,
         }}
       />
 
@@ -171,7 +180,7 @@ export default function ExplodedGlazingMilkVideo() {
           margin: '0 auto 1.8rem auto',
           textAlign: 'center',
           position: 'relative',
-          zIndex: 4,
+          zIndex: 6,
           padding: '0 4vw',
         }}
       >
@@ -203,7 +212,7 @@ export default function ExplodedGlazingMilkVideo() {
         </p>
       </div>
 
-      {/* Expanded Cinematic Video Stage */}
+      {/* Cinematic Video Stage */}
       <div
         style={{
           width: '100%',
@@ -228,14 +237,20 @@ export default function ExplodedGlazingMilkVideo() {
           }}
         />
 
-        {/* Video Wrapper */}
+        {/* Video Masked Container — applies both CSS hardware-accelerated masks and edge feathering */}
         <div
           style={{
             position: 'relative',
             width: '100%',
             aspectRatio: '16 / 9',
             backgroundColor: 'transparent',
-            overflow: 'visible',
+            overflow: 'hidden',
+            isolation: 'isolate',
+            transform: 'translateZ(0)',
+            WebkitMaskImage: 'radial-gradient(ellipse 76% 74% at 50% 50%, #000000 40%, rgba(0, 0, 0, 0.85) 60%, rgba(0, 0, 0, 0.4) 75%, transparent 96%)',
+            maskImage: 'radial-gradient(ellipse 76% 74% at 50% 50%, #000000 40%, rgba(0, 0, 0, 0.85) 60%, rgba(0, 0, 0, 0.4) 75%, transparent 96%)',
+            WebkitMaskSize: '100% 100%',
+            maskSize: '100% 100%',
             zIndex: 2,
           }}
         >
@@ -243,6 +258,8 @@ export default function ExplodedGlazingMilkVideo() {
             ref={videoRef}
             playsInline
             loop
+            muted
+            autoPlay
             preload="auto"
             style={{
               width: '100%',
@@ -251,9 +268,6 @@ export default function ExplodedGlazingMilkVideo() {
               display: 'block',
               backgroundColor: 'transparent',
               pointerEvents: 'none',
-              /* Aggressive feathered mask on ALL sides — edges dissolve completely into the background */
-              WebkitMaskImage: 'radial-gradient(ellipse 78% 82% at 50% 50%, #000000 50%, rgba(0, 0, 0, 0.8) 65%, rgba(0, 0, 0, 0.4) 80%, rgba(0, 0, 0, 0.1) 92%, transparent 100%)',
-              maskImage: 'radial-gradient(ellipse 78% 82% at 50% 50%, #000000 50%, rgba(0, 0, 0, 0.8) 65%, rgba(0, 0, 0, 0.4) 80%, rgba(0, 0, 0, 0.1) 92%, transparent 100%)',
             }}
           >
             <source src="/glazing-milk-exploded.mp4" type="video/mp4" />
@@ -261,8 +275,76 @@ export default function ExplodedGlazingMilkVideo() {
             <source src="/glazing-milk-exploded.mp4.mp4" type="video/mp4" />
             Your browser does not support HTML5 video playback.
           </video>
+
+          {/* Top border dissolve overlay — completely blends the top edge into surrounding tone */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '120px',
+              background: 'linear-gradient(to bottom, #D7C6B3 0%, rgba(215, 198, 179, 0.85) 30%, rgba(215, 198, 179, 0.4) 65%, transparent 100%)',
+              pointerEvents: 'none',
+              zIndex: 3,
+            }}
+          />
+
+          {/* Bottom border dissolve overlay — completely blends bottom edge */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: '120px',
+              background: 'linear-gradient(to top, #D4C1AE 0%, rgba(212, 193, 174, 0.85) 30%, rgba(212, 193, 174, 0.4) 65%, transparent 100%)',
+              pointerEvents: 'none',
+              zIndex: 3,
+            }}
+          />
+
+          {/* Left border dissolve overlay — completely blends left edge */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: 0,
+              width: '160px',
+              background: 'linear-gradient(to right, #D8C8B7 0%, rgba(216, 200, 183, 0.9) 35%, rgba(216, 200, 183, 0.3) 75%, transparent 100%)',
+              pointerEvents: 'none',
+              zIndex: 3,
+            }}
+          />
+
+          {/* Right border dissolve overlay — completely blends right edge */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              right: 0,
+              width: '160px',
+              background: 'linear-gradient(to left, #C6B39E 0%, rgba(198, 179, 158, 0.9) 35%, rgba(198, 179, 158, 0.3) 75%, transparent 100%)',
+              pointerEvents: 'none',
+              zIndex: 3,
+            }}
+          />
+
+          {/* Perimeter Vignette Feather Overlay — guarantees 0 hard borders anywhere */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'radial-gradient(ellipse 82% 80% at 50% 50%, transparent 55%, rgba(215, 198, 179, 0.45) 75%, rgba(200, 180, 160, 0.95) 98%)',
+              pointerEvents: 'none',
+              zIndex: 4,
+            }}
+          />
         </div>
       </div>
     </section>
   );
 }
+

@@ -1,11 +1,29 @@
 import React, { useState } from 'react';
 import { X, Check, Star, Sparkles, Droplet } from 'lucide-react';
+import GlazingMilkDetailView from './GlazingMilkDetailView';
 
 export default function ProductModal({ product, onClose, onAddToCart }) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
   if (!product) return null;
+
+  const isGlazingMilk =
+    product.isGlazingMilk ||
+    product.id === 'glazing-milk' ||
+    product.id === 'lumineuse' ||
+    (product.name && product.name.toLowerCase().includes('glazing')) ||
+    (product.name && product.name.toLowerCase().includes('milk'));
+
+  if (isGlazingMilk) {
+    return (
+      <GlazingMilkDetailView
+        isOpen={true}
+        onClose={onClose}
+        onAddToCart={onAddToCart}
+      />
+    );
+  }
 
   const handleAdd = () => {
     onAddToCart(product, quantity);
