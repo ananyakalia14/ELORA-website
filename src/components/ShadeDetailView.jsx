@@ -102,13 +102,13 @@ export default function ShadeDetailView({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        animation: 'pdpFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        animation: 'pdpSmoothReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards',
       }}
       role="dialog"
       aria-modal="true"
-      aria-label={`Élora Peptide Lip Tint ${activeShade.name} Product Detail View`}
+      aria-label={`Élora Highlight Milk ${activeShade.name} Product Detail View`}
     >
-      {/* 1. Full-Bleed Background Visual with smooth image swap */}
+      {/* 1. Full-Bleed Background Visual with smooth reveal animation */}
       <div
         className="absolute inset-0 w-full h-full pointer-events-none z-0"
         style={{
@@ -117,37 +117,34 @@ export default function ShadeDetailView({
           width: '100%',
           height: '100%',
           overflow: 'hidden',
-          backgroundColor: '#FAF5ED',
+          backgroundColor: '#F9F6F0',
         }}
       >
         <img
           key={activeShade.id}
           src={activeShade.image}
-          alt={`Élora Peptide Lip Tint ${activeShade.name}`}
-          className="w-full h-full object-cover object-center pointer-events-none"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: '32% center',
-            imageRendering: 'auto',
-            pointerEvents: 'none',
-            animation: 'pdpFadeIn 0.45s ease-out forwards',
+          onError={(e) => {
+            if (activeShade.fallbackImage) {
+              e.currentTarget.src = activeShade.fallbackImage;
+            }
           }}
+          alt={`Élora Highlight Milk ${activeShade.name}`}
+          className="elora-shade-pdp-bg"
           loading="eager"
         />
 
-        {/* Soft Warm Scrim Gradient over photo */}
+        {/* Soft Warm Scrim Gradient over photo to preserve visual contrast for text */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
             background:
-              'linear-gradient(to right, rgba(249, 246, 240, 0) 0%, rgba(249, 246, 240, 0.15) 45%, rgba(249, 246, 240, 0.65) 100%)',
+              'linear-gradient(to right, rgba(249, 246, 240, 0) 0%, rgba(249, 246, 240, 0.06) 38%, rgba(249, 246, 240, 0.48) 72%, rgba(249, 246, 240, 0.78) 100%)',
             pointerEvents: 'none',
             zIndex: 1,
           }}
         />
+
       </div>
 
       {/* 2. Overlaid Header */}
@@ -241,7 +238,7 @@ export default function ShadeDetailView({
         }}
       >
         <div
-          className="w-full max-w-[430px] bg-[#FAF6F0]/92 backdrop-blur-xl border border-white/85 shadow-[0_25px_60px_rgba(58,46,43,0.16)] rounded-[28px] p-8 md:p-9 text-[#3A2E2B] elora-pdp-buy-card"
+          className="w-full max-w-[430px] bg-[#FAF6F0]/94 backdrop-blur-xl border border-white/85 shadow-[0_25px_60px_rgba(58,46,43,0.16)] rounded-[28px] p-8 md:p-9 text-[#3A2E2B] elora-pdp-buy-card elora-shade-pdp-card"
           style={{
             width: '100%',
             maxWidth: '430px',
@@ -309,7 +306,7 @@ export default function ShadeDetailView({
               letterSpacing: '-0.01em',
             }}
           >
-            Peptide Lip Tint
+            Highlight Milk
           </h1>
 
           <p
@@ -448,9 +445,9 @@ export default function ShadeDetailView({
                       borderRadius: '999px',
                       padding: '4px',
                       cursor: 'pointer',
-                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                      transform: isSelected ? 'scale(1.08)' : 'scale(1)',
-                      boxShadow: isSelected ? '0 4px 12px rgba(58, 46, 43, 0.2)' : 'none',
+                      transition: 'all 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
+                      transform: isSelected ? 'scale(1.12)' : 'scale(1)',
+                      boxShadow: isSelected ? '0 4px 14px rgba(58, 46, 43, 0.22)' : 'none',
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
