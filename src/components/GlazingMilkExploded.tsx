@@ -115,8 +115,8 @@ export default function ExplodedGlazingMilkVideo() {
           top: 0,
           left: 0,
           right: 0,
-          height: '80px',
-          background: 'linear-gradient(to bottom, #F9F6F0 0%, transparent 100%)',
+          height: '140px',
+          background: 'linear-gradient(to bottom, #F9F6F0 0%, rgba(249, 246, 240, 0.7) 40%, transparent 100%)',
           pointerEvents: 'none',
           zIndex: 3,
         }}
@@ -129,8 +129,36 @@ export default function ExplodedGlazingMilkVideo() {
           bottom: 0,
           left: 0,
           right: 0,
-          height: '60px',
-          background: 'linear-gradient(to top, #F9F6F0 0%, transparent 100%)',
+          height: '120px',
+          background: 'linear-gradient(to top, #F9F6F0 0%, rgba(249, 246, 240, 0.7) 40%, transparent 100%)',
+          pointerEvents: 'none',
+          zIndex: 3,
+        }}
+      />
+
+      {/* Left edge transition: dissolves into the warm background */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          width: '160px',
+          background: 'linear-gradient(to right, #D8C8B7 0%, rgba(216, 200, 183, 0.6) 40%, transparent 100%)',
+          pointerEvents: 'none',
+          zIndex: 3,
+        }}
+      />
+
+      {/* Right edge transition: dissolves into the warm background */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          right: 0,
+          width: '160px',
+          background: 'linear-gradient(to left, #C6B39E 0%, rgba(198, 179, 158, 0.6) 40%, transparent 100%)',
           pointerEvents: 'none',
           zIndex: 3,
         }}
@@ -179,7 +207,7 @@ export default function ExplodedGlazingMilkVideo() {
       <div
         style={{
           width: '100%',
-          maxWidth: '1540px', // Expands across the viewport
+          maxWidth: '1540px',
           margin: '0 auto',
           position: 'relative',
           display: 'flex',
@@ -222,10 +250,10 @@ export default function ExplodedGlazingMilkVideo() {
               objectFit: 'contain',
               display: 'block',
               backgroundColor: 'transparent',
-              pointerEvents: 'none', // Prevents click-to-pause and native controls
-              // Wide soft feather mask: dissolves the outer perimeter so the video merges invisibly with the background
-              WebkitMaskImage: 'radial-gradient(ellipse 94% 90% at 50% 50%, #000000 70%, rgba(0, 0, 0, 0.85) 85%, rgba(0, 0, 0, 0.35) 94%, transparent 100%)',
-              maskImage: 'radial-gradient(ellipse 94% 90% at 50% 50%, #000000 70%, rgba(0, 0, 0, 0.85) 85%, rgba(0, 0, 0, 0.35) 94%, transparent 100%)',
+              pointerEvents: 'none',
+              /* Aggressive feathered mask on ALL sides — edges dissolve completely into the background */
+              WebkitMaskImage: 'radial-gradient(ellipse 78% 82% at 50% 50%, #000000 50%, rgba(0, 0, 0, 0.8) 65%, rgba(0, 0, 0, 0.4) 80%, rgba(0, 0, 0, 0.1) 92%, transparent 100%)',
+              maskImage: 'radial-gradient(ellipse 78% 82% at 50% 50%, #000000 50%, rgba(0, 0, 0, 0.8) 65%, rgba(0, 0, 0, 0.4) 80%, rgba(0, 0, 0, 0.1) 92%, transparent 100%)',
             }}
           >
             <source src="/glazing-milk-exploded.mp4" type="video/mp4" />

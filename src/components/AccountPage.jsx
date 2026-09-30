@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Lock, Eye, EyeOff, User, X, Check, Sparkles, Package, LogOut, ShoppingBag } from 'lucide-react';
-import AnnouncementTicker from './AnnouncementTicker';
 import Header from './Header';
 import Footer from './Footer';
 
@@ -8,13 +7,14 @@ import Footer from './Footer';
  * Full-Screen Standalone Account Page for Élora Skin & Beauty
  * 
  * Design Architecture:
- * - Top: Merged luxury site header (Announcement Ticker + transparent Header)
- *        with SHOP, ABOUT, JOURNAL, centered Élora logo, SEARCH, ACCOUNT, BAG.
- * - Background: Silky, soothing warm alabaster plaster gradient (zero blurriness, zero jaggedness).
- * - Left Column: Intravenous IV infusion drip pouch filled with Élora formulas,
- *                rendered razor-sharp and proportionally contained with generous breathing room.
- * - Right Column: Glassmorphic portal sanctuary card housing interactive Sign In,
- *                 Create Account (Register), Forgot Password, and VIP Dashboard views.
+ * - Top: 100% Transparent luxury navigation header (SHOP, ABOUT, JOURNAL, centered Élora logo, SEARCH, ACCOUNT, BAG)
+ * - Hero Wrap: Full-screen 2K sunlit plaster wall with diagonal palm shadows and hanging IV infusion pouch art
+ * - Left Column: Spacer on desktop (pouch rendered directly in background), responsive pouch image on mobile
+ * - Right Column: Form elements floating directly against the sunlit wall with NO container card box:
+ *                 - Serif É L O R A logotype + SKIN & BEAUTY subtitle
+ *                 - Frosted translucent pill inputs with Mail and Lock icons
+ *                 - Terracotta rose #AA776A pill SIGN IN button
+ *                 - Direct sublinks for password recovery and account creation
  * - Bottom: Full Élora luxury footer revealed smoothly on scroll down.
  */
 export default function AccountPage({
@@ -167,54 +167,59 @@ export default function AccountPage({
       role="main"
       aria-label="Élora Skin & Beauty Account Page"
     >
-      {/* 1. Merged Luxury Site Header (Announcement Ticker + Navigation Header) */}
-      <div className="elora-account-header-wrapper">
-        <AnnouncementTicker />
-        <Header
-          cartCount={cartCount}
-          onOpenCart={() => {
-            onClose();
-            if (onOpenCart) onOpenCart();
-          }}
-          onOpenSearch={() => {
-            onClose();
-            if (onOpenSearch) onOpenSearch();
-          }}
-          onOpenAccount={() => {
-            // Already on account page, gently scroll to form top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          introFinished={true}
-          onNavigate={handleNav}
-        />
-      </div>
-
-      {/* 2. Main Full-Screen Layout */}
-      <div className="elora-account-page-body">
-        {/* Left Side: Intravenous Infusion Pouch Art */}
-        <div className="elora-account-hero-col">
-          <div className="elora-account-pouch-frame">
-            <img
-              src="/images/elora-account-user-bg.png"
-              alt="Élora Skin Nutrition Intravenously Optimised"
-              className="elora-account-pouch-hero-img"
-              onError={(e) => {
-                e.currentTarget.src = '/images/user-bg.png';
-              }}
-            />
-          </div>
+      {/* Hero Section Container (Transparent Nav Header + 2K Sunlit Wall & IV Pouch + Floating Form) */}
+      <div className="elora-account-hero-wrap">
+        {/* 1. Transparent Navigation Header Bar */}
+        <div className="elora-account-header-wrapper">
+          <Header
+            cartCount={cartCount}
+            onOpenCart={() => {
+              onClose();
+              if (onOpenCart) onOpenCart();
+            }}
+            onOpenSearch={() => {
+              onClose();
+              if (onOpenSearch) onOpenSearch();
+            }}
+            onOpenAccount={() => {
+              const root = document.querySelector('.elora-account-page-root');
+              if (root) {
+                root.scrollTo({ top: 0, behavior: 'smooth' });
+              } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+            introFinished={true}
+            onNavigate={handleNav}
+          />
         </div>
 
-        {/* Right Side: Soothing Glassmorphic Portal Container */}
-        <div className="elora-account-form-col">
-          <div className="elora-account-portal-card">
+        {/* 2. Main Full-Screen Layout */}
+        <div className="elora-account-page-body">
+          {/* Left Side: Intravenous Infusion Pouch Art */}
+          <div className="elora-account-hero-col">
+            <div className="elora-account-pouch-frame">
+              <img
+                src="/images/elora-iv-pouch.png"
+                alt="Élora Skin Nutrition Intravenously Optimised"
+                className="elora-account-pouch-hero-img"
+                onError={(e) => {
+                  e.currentTarget.src = '/images/elora-account-user-bg.png';
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Right Side: Floating Sanctuary Portal */}
+          <div className="elora-account-form-col">
+            <div className="elora-account-portal-card">
             
             {/* VIEW 1: SIGN IN */}
             {view === 'signin' && (
               <div className="elora-account-form-inner">
                 {/* Brand Logo & Subtitle */}
                 <div className="elora-account-page-logo-block">
-                  <h1 className="elora-account-page-title">É L O R A</h1>
+                  <h1 className="elora-account-page-title">ÉLORA</h1>
                   <p className="elora-account-page-subtitle">SKIN &amp; BEAUTY</p>
                 </div>
 
@@ -566,6 +571,7 @@ export default function AccountPage({
 
           </div>
         </div>
+      </div>
       </div>
 
       {/* 3. Luxury Élora Site Footer with smooth gradient fade */}
