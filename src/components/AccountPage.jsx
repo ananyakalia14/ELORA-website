@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, Eye, EyeOff, User, X, Check, Sparkles, Package, LogOut, ShoppingBag } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Check, Package, LogOut, ShoppingBag } from 'lucide-react';
 import Header from './Header';
 import Footer from './Footer';
+import { API_BASE_URL } from '../config/api';
 
 /**
  * Full-Screen Standalone Account Page for Élora Skin & Beauty
@@ -24,9 +25,6 @@ export default function AccountPage({
   onOpenSearch,
   cartCount = 0,
 }) {
-  // Views: 'signin' | 'signup' | 'forgot' | 'dashboard'
-  const [view, setView] = useState('signin');
-
   // Input states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,15 +35,61 @@ export default function AccountPage({
   const [errorMessage, setErrorMessage] = useState('');
   const [forgotSent, setForgotSent] = useState(false);
 
-  // User session
+  // User session & real orders from PostgreSQL database
   const [currentUser, setCurrentUser] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [view, setView] = useState('signin');
 
-  // Manage hash route and body scrolling
+  // Verify real session with PostgreSQL database on open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
       if (window.location.hash !== '#account') {
         window.history.pushState(null, '', '#account');
+      }
+
+      // Check real JWT token against PostgreSQL database
+      const token = localStorage.getItem('elora_token');
+      if (token) {
+        fetch(`${API_BASE_URL}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+          .then(async (res) => {
+            if (res.ok) {
+              const me = await res.json();
+              const verifiedUser = {
+                id: me.id,
+                name: me.name,
+                email: me.email,
+                role: me.role,
+                memberSince: me.created_at
+                  ? new Date(me.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                  : '2026',
+                token: token,
+              };
+              setCurrentUser(verifiedUser);
+              setView('dashboard');
+
+              // Fetch orders from database
+              fetch(`${API_BASE_URL}/orders`, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+                .then((r) => (r.ok ? r.json() : []))
+                .then((dbOrders) => setOrders(dbOrders))
+                .catch(() => setOrders([]));
+            } else {
+              // Token invalid or expired, clear storage and show signin
+              localStorage.removeItem('elora_token');
+              localStorage.removeItem('elora_user');
+              setCurrentUser(null);
+              setView('signin');
+            }
+          })
+          .catch(() => {
+            setView('signin');
+          });
+      } else {
+        setView('signin');
       }
 
       const handlePopState = () => {
@@ -91,53 +135,186 @@ export default function AccountPage({
     }
   };
 
-  // Handle Sign In submit
-  const handleSignIn = (e) => {
+  // Handle Sign In submit — Authenticates strictly against PostgreSQL database
+  const handleSignIn = async (e) => {
     e.preventDefault();
     setErrorMessage('');
 
-    if (!email.trim() || !password.trim()) {
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedEmail || !trimmedPassword) {
       setErrorMessage('Please enter both your email and password.');
       return;
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      const displayName = email.split('@')[0].replace(/[._]/g, ' ');
-      const formattedName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
-      setCurrentUser({
-        name: formattedName || 'Élise Dupont',
-        email: email,
-        tier: 'Élora Étoile Privé (Tier II)',
-        points: 480,
+    try {
+      const formData = new URLSearchParams();
+      formData.append('username', trimmedEmail);
+      formData.append('password', trimmedPassword);
+
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData,
       });
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('Invalid email or password. Please verify your credentials or register for an account.');
+        } else if (res.status === 404) {
+          throw new Error('Account not found with this email. Please create an account.');
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || 'Sign in failed. Please check your credentials.');
+        }
+      }
+
+      const data = await res.json();
+      const token = data.access_token;
+
+      // Fetch verified user from PostgreSQL database
+      const meRes = await fetch(`${API_BASE_URL}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!meRes.ok) {
+        throw new Error('Failed to retrieve user profile from database.');
+      }
+
+      const me = await meRes.json();
+      const verifiedUser = {
+        id: me.id,
+        name: me.name,
+        email: me.email,
+        role: me.role,
+        memberSince: me.created_at
+          ? new Date(me.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+          : '2026',
+        token: token,
+      };
+
+      // Fetch user real orders from PostgreSQL database
+      try {
+        const ordersRes = await fetch(`${API_BASE_URL}/orders`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (ordersRes.ok) {
+          const userOrders = await ordersRes.json();
+          setOrders(userOrders);
+        }
+      } catch {
+        // Orders optional if none exist yet
+      }
+
+      localStorage.setItem('elora_token', token);
+      localStorage.setItem('elora_user', JSON.stringify(verifiedUser));
+      setCurrentUser(verifiedUser);
       setView('dashboard');
-    }, 700);
+    } catch (err) {
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        setErrorMessage('Cannot connect to authentication database server. Please ensure the backend is running.');
+      } else {
+        setErrorMessage(err.message || 'Invalid credentials.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Handle Sign Up (Register) submit
-  const handleSignUp = (e) => {
+  // Handle Sign Up submit — Creates user in PostgreSQL database
+  const handleSignUp = async (e) => {
     e.preventDefault();
     setErrorMessage('');
 
-    if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
+    const trimmedFirst = firstName.trim();
+    const trimmedLast = lastName.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedFirst || !trimmedLast || !trimmedEmail || !trimmedPassword) {
       setErrorMessage('Please fill in all fields to create your account.');
       return;
     }
 
+    if (trimmedPassword.length < 6) {
+      setErrorMessage('Password must be at least 6 characters.');
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      const fullName = `${firstName.trim()} ${lastName.trim()}`;
-      setCurrentUser({
-        name: fullName,
-        email: email,
-        tier: 'Élora Étoile Privé (Tier I)',
-        points: 100,
+    try {
+      const fullName = `${trimmedFirst} ${trimmedLast}`;
+      const res = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: fullName,
+          email: trimmedEmail,
+          password: trimmedPassword,
+        }),
       });
+
+      if (!res.ok) {
+        if (res.status === 400) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || 'This email is already registered in the database. Please sign in instead.');
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || 'Could not register account in database.');
+        }
+      }
+
+      // Account created in PostgreSQL! Authenticate to obtain real JWT token
+      const formData = new URLSearchParams();
+      formData.append('username', trimmedEmail);
+      formData.append('password', trimmedPassword);
+
+      const loginRes = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData,
+      });
+
+      if (!loginRes.ok) {
+        throw new Error('Account created, but sign-in failed. Please sign in manually.');
+      }
+
+      const loginData = await loginRes.json();
+      const token = loginData.access_token;
+
+      // Fetch user profile from DB
+      const meRes = await fetch(`${API_BASE_URL}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const me = meRes.ok ? await meRes.json() : { name: fullName, email: trimmedEmail, created_at: new Date() };
+      const verifiedUser = {
+        id: me.id,
+        name: me.name,
+        email: me.email,
+        role: me.role,
+        memberSince: me.created_at
+          ? new Date(me.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+          : '2026',
+        token: token,
+      };
+
+      localStorage.setItem('elora_token', token);
+      localStorage.setItem('elora_user', JSON.stringify(verifiedUser));
+      setCurrentUser(verifiedUser);
+      setOrders([]);
       setView('dashboard');
-    }, 800);
+    } catch (err) {
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        setErrorMessage('Cannot connect to authentication database server. Please ensure the backend is running.');
+      } else {
+        setErrorMessage(err.message || 'Could not create account.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle Forgot Password submit
@@ -155,9 +332,15 @@ export default function AccountPage({
   };
 
   const handleSignOut = () => {
+    localStorage.removeItem('elora_token');
+    localStorage.removeItem('elora_user');
+    localStorage.removeItem('elora_orders');
     setCurrentUser(null);
+    setOrders([]);
     setEmail('');
     setPassword('');
+    setFirstName('');
+    setLastName('');
     setView('signin');
   };
 
@@ -510,42 +693,89 @@ export default function AccountPage({
               </div>
             )}
 
-            {/* VIEW 4: VIP MEMBER DASHBOARD */}
+            {/* VIEW 4: CLIENT ACCOUNT SANCTUARY */}
             {view === 'dashboard' && currentUser && (
               <div className="elora-account-dash-view">
                 <div className="elora-account-dash-header-block">
-                  <span className="elora-account-dash-pill">ÉLORA ÉTOILE CLUB</span>
+                  <span className="elora-account-dash-pill">ÉLORA CLIENT PROFILE</span>
                   <h3 className="elora-account-dash-name">
-                    Welcome back, {currentUser.name}
+                    Welcome back, {currentUser.name || currentUser.email}
                   </h3>
-                  <p className="elora-account-dash-subtitle">{currentUser.tier}</p>
+                  <p className="elora-account-dash-subtitle">{currentUser.email}</p>
                 </div>
 
-                {/* Loyalty Tier Box */}
+                {/* Account Status Card */}
                 <div className="elora-account-dash-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Sparkles size={16} color="#AC7E76" />
-                    <span style={{ fontSize: '0.86rem', fontWeight: 600, color: '#3A2E2B' }}>
-                      {currentUser.points} Radiant Reward Points
+                  <div className="elora-account-dash-card-row">
+                    <span className="elora-account-dash-card-label">Account Status</span>
+                    <span className="elora-account-dash-card-val" style={{ color: '#2E7D32', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <Check size={13} strokeWidth={2.5} /> Active Member
                     </span>
                   </div>
-                  <span className="elora-account-dash-card-note">
-                    Tier status unlocks complimentary shipping on all botanical rituals.
-                  </span>
+                  <div className="elora-account-dash-card-row" style={{ marginTop: '2px' }}>
+                    <span className="elora-account-dash-card-label">Member Since</span>
+                    <span className="elora-account-dash-card-val">{currentUser.memberSince || '2026'}</span>
+                  </div>
                 </div>
 
-                {/* Order Summary */}
+                {/* Order Summary & History */}
                 <div className="elora-account-dash-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <Package size={16} color="#5A4A45" />
-                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#3A2E2B' }}>
-                      Recent Order #EL-8942 • Delivered
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: orders.length > 0 ? '6px' : '2px' }}>
+                    <Package size={15} color="#AC7E76" />
+                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#3A2E2B', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                      Recent Orders
                     </span>
                   </div>
-                  <p className="elora-account-dash-card-desc">
-                    Glazing Milk Essence (Ceramide Veil) + The Hero Serum (Original)
-                  </p>
+
+                  {orders && orders.length > 0 ? (
+                    <div className="elora-account-order-list">
+                      {orders.map((order, idx) => (
+                        <div key={order.id || idx} className="elora-account-order-item">
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 600, color: '#2E1A16' }}>
+                            <span>Order #{order.id}</span>
+                            <span style={{ color: '#AC7E76' }}>{order.status || 'Confirmed'}</span>
+                          </div>
+                          <p className="elora-account-order-desc">
+                            {order.items?.map((it) => `${it.name}${it.quantity > 1 ? ` (x${it.quantity})` : ''}`).join(', ') || 'Botanical Ritual'}
+                          </p>
+                          <span style={{ fontSize: '0.72rem', color: '#776863' }}>
+                            Total: ${order.total?.toFixed(2) || '0.00'} • {order.date || 'Recent'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="elora-account-empty-orders">
+                      <p className="elora-account-empty-desc">
+                        No purchase history yet. Items from your completed orders will appear here.
+                      </p>
+                    </div>
+                  )}
                 </div>
+
+                {/* Shopping Bag Quick Action if items in cart */}
+                {cartCount > 0 && (
+                  <div className="elora-account-dash-card">
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <ShoppingBag size={15} color="#AC7E76" />
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#3A2E2B' }}>
+                          Shopping Bag ({cartCount} {cartCount === 1 ? 'item' : 'items'})
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        className="elora-account-card-action-link"
+                        onClick={() => {
+                          onClose();
+                          onOpenCart?.();
+                        }}
+                      >
+                        View Bag →
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Action Buttons */}
                 <div className="elora-account-dash-btn-group">
@@ -566,7 +796,7 @@ export default function AccountPage({
                         onOpenCart();
                       }}
                     >
-                      <ShoppingBag size={15} /> VIEW SHOPPING BAG
+                      <ShoppingBag size={15} /> VIEW SHOPPING BAG {cartCount > 0 ? `(${cartCount})` : ''}
                     </button>
                   )}
 

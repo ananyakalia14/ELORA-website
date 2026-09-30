@@ -38,11 +38,11 @@ export default function CartDrawer({
       >
         {/* Cart Header */}
         <div className="cart-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h3 style={{ fontFamily: 'var(--font-serif-display)', fontSize: '1.45rem', color: 'var(--color-espresso)' }}>
+          <div className="cart-header-title-wrap">
+            <h3 className="cart-header-title">
               Your Bag
             </h3>
-            <span style={{ fontSize: '0.82rem', color: 'var(--color-espresso-light)', fontWeight: 500 }}>
+            <span className="cart-header-count">
               ({items.reduce((sum, item) => sum + item.quantity, 0)})
             </span>
           </div>
@@ -59,12 +59,12 @@ export default function CartDrawer({
         {/* Dynamic Free Shipping Progress Bar ($75 Threshold) */}
         <div className="cart-shipping-banner">
           {remainingForFreeShipping > 0 ? (
-            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--color-espresso)' }}>
+            <p className="cart-shipping-text">
               Add <strong>${remainingForFreeShipping.toFixed(2)}</strong> for{' '}
               <strong>complimentary shipping</strong>
             </p>
           ) : (
-            <p style={{ margin: 0, color: '#27672B', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem' }}>
+            <p className="cart-shipping-unlocked">
               <Sparkles size={14} /> You've unlocked complimentary shipping + travel elixir!
             </p>
           )}
@@ -95,29 +95,32 @@ export default function CartDrawer({
               </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+            <div className="cart-items-list">
               {items.map((item) => (
                 <div key={item.id} className="cart-item-card">
                   <div className="cart-item-thumb">
                     <img src={item.image} alt={item.name} />
                   </div>
                   <div className="cart-item-info">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <h4 style={{ fontFamily: 'var(--font-serif-display)', fontSize: '1.12rem', color: 'var(--color-espresso)', margin: 0 }}>
+                    <div className="cart-item-header-row">
+                      <h4 className="cart-item-title">
                         {item.name}
                       </h4>
-                      <span style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--color-espresso)' }}>
+                      <span className="cart-item-price">
                         ${(item.price * item.quantity).toFixed(2)}
                       </span>
                     </div>
 
                     {/* Variant and volume line */}
-                    <div style={{ fontSize: '0.74rem', color: '#776863', margin: '2px 0 8px 0', display: 'flex', gap: '8px' }}>
-                      {item.variantName && <span>{item.variantName}</span>}
-                      {item.volume && <span>• {item.volume}</span>}
-                    </div>
+                    {(item.variantName || item.volume) && (
+                      <div className="cart-item-meta">
+                        {item.variantName && <span>{item.variantName}</span>}
+                        {item.variantName && item.volume && <span>•</span>}
+                        {item.volume && <span>{item.volume}</span>}
+                      </div>
+                    )}
 
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div className="cart-item-actions-row">
                       {/* Stepper (+ / - / remove) */}
                       <div className="cart-stepper">
                         <button
@@ -142,7 +145,7 @@ export default function CartDrawer({
                         className="cart-remove-btn"
                         aria-label={`Remove ${item.name}`}
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={15} />
                       </button>
                     </div>
                   </div>
@@ -187,14 +190,14 @@ export default function CartDrawer({
         {/* Cart Footer */}
         {items.length > 0 && (
           <div className="cart-footer">
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.94rem' }}>
-              <span style={{ color: 'var(--color-espresso-light)' }}>Subtotal</span>
-              <span style={{ fontWeight: 600, fontSize: '1.18rem', color: 'var(--color-espresso)' }}>
+            <div className="cart-subtotal-row">
+              <span className="cart-subtotal-label">Subtotal</span>
+              <span className="cart-subtotal-value">
                 ${subtotal.toFixed(2)}
               </span>
             </div>
 
-            <p style={{ fontSize: '0.74rem', color: '#776863', margin: '0 0 1rem 0' }}>
+            <p className="cart-taxes-note">
               Taxes and complimentary shipping calculated at checkout.
             </p>
 
@@ -207,8 +210,8 @@ export default function CartDrawer({
               <ArrowRight size={16} />
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.72rem', color: '#776863', marginTop: '12px' }}>
-              <ShieldCheck size={13} color="#C4A265" />
+            <div className="cart-sample-perk">
+              <ShieldCheck size={14} color="#AC7E76" />
               <span>Complimentary deluxe mini sample included with every order</span>
             </div>
           </div>

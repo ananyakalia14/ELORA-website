@@ -17,6 +17,7 @@ import PressSection from './components/PressSection';
 import CartDrawer from './components/CartDrawer';
 import SearchDrawer from './components/SearchDrawer';
 import AccountPage from './components/AccountPage';
+import CheckoutPage from './components/CheckoutPage';
 import MobileStickyCta from './components/MobileStickyCta';
 import Footer from './components/Footer';
 import { PRODUCTS } from './data/products';
@@ -30,6 +31,9 @@ export default function App() {
 
   // Account modal state
   const [accountOpen, setAccountOpen] = useState(false);
+
+  // Checkout page state
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   // Cart state (starts empty with BAG (0) as requested)
   const [cartOpen, setCartOpen] = useState(false);
@@ -323,7 +327,19 @@ export default function App() {
         onRemoveItem={handleRemoveItem}
         onAddCrossSell={handleAddToCart}
         onCheckout={() => {
-          alert('Proceeding to Élora Secure Checkout...');
+          setCartOpen(false);
+          setCheckoutOpen(true);
+        }}
+      />
+
+      {/* Luxury Atelier Checkout Page with 3D Factory Processing Machine */}
+      <CheckoutPage
+        isOpen={checkoutOpen}
+        onClose={() => setCheckoutOpen(false)}
+        items={cartItems}
+        onClearCart={() => setCartItems([])}
+        onOpenStore={() => {
+          setCheckoutOpen(false);
         }}
       />
     </div>
