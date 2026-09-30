@@ -187,15 +187,17 @@ export default function ShadeDetailView({
         </button>
 
         <span
-          className="font-serif text-2xl md:text-3xl text-[#3A2E2B] font-normal tracking-[0.06em]"
+          className="font-serif text-2xl md:text-3xl text-[#3A2E2B] font-normal tracking-[0.14em]"
           style={{
             fontFamily: "var(--font-serif-display, 'Italiana', 'Cormorant Garamond', Georgia, serif)",
             fontSize: 'clamp(1.6rem, 2.4vw, 2.2rem)',
             color: '#3A2E2B',
             fontWeight: 400,
+            textTransform: 'uppercase',
+            letterSpacing: '0.14em',
           }}
         >
-          élora
+          ÉLORA
         </span>
 
         <button
