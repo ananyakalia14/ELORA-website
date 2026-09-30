@@ -1,225 +1,238 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
-interface Annotation {
-  id: string;
-  badge: string;
-  title: string;
-  desc: string;
-  start: number;
-  end: number;
-  position: React.CSSProperties;
-}
-
-const annotations: Annotation[] = [
-  {
-    id: 'cap',
-    badge: 'AIRTIGHT BARRIER',
-    title: 'Soft-Touch Alabaster Cap',
-    desc: 'Precision seal prevents oxidation and locks in botanical active potency.',
-    start: 0.15,
-    end: 0.45,
-    position: { top: '22%', left: '8%' }
-  },
-  {
-    id: 'core',
-    badge: 'BIO-CELLULAR COMPLEX',
-    title: 'Luminous Ceramide Milk',
-    desc: 'Alpine rose stem cells micro-emulsified in cold-pressed plum ceramides.',
-    start: 0.4,
-    end: 0.7,
-    position: { top: '45%', right: '8%' }
-  },
-  {
-    id: 'flacon',
-    badge: 'SUSTAINABLE LUXURY',
-    title: 'UV-Shielded Recycled Flacon',
-    desc: 'Heavyweight flacon engineered to protect light-sensitive phyto-nutrients.',
-    start: 0.65,
-    end: 0.95,
-    position: { bottom: '18%', left: '8%' }
-  }
-];
-
+/**
+ * GlazingMilkExploded Video Section
+ * 
+ * Requirements:
+ * 1. Expanded video stage with seamless background merging (no floating box or isolated oval).
+ *    Section background matches the video's warm silk tones and smoothly dissolves into page cream above and below.
+ * 2. Reduced vertical space below the video and above the product carousel (no wasted space).
+ * 3. Plays automatically when user scrolls into view.
+ * 4. Pauses automatically when user scrolls away.
+ * 5. Plays again whenever the user scrolls back to this part of the screen.
+ * 6. Sound is ON (unmuted, volume=1.0) with seamless gesture-based browser autoplay policy handling.
+ * 7. Completely clean: zero badges, zero controls, zero pause/mute buttons.
+ */
 export default function ExplodedGlazingMilkVideo() {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current || !videoRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const totalScrollable = rect.height - window.innerHeight;
-      
-      const currentScroll = Math.min(Math.max(-rect.top / totalScrollable, 0), 1);
-      setProgress(currentScroll);
+    const video = videoRef.current;
+    const container = containerRef.current;
+    if (!video || !container) return;
 
-      if (videoRef.current.duration) {
-        videoRef.current.currentTime = currentScroll * videoRef.current.duration;
+    // Ensure volume is 100%
+    video.volume = 1.0;
+
+    // Function to ensure audio is unmuted on any user activity
+    const enableAudio = () => {
+      if (videoRef.current) {
+        videoRef.current.muted = false;
+        videoRef.current.volume = 1.0;
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    const gestureEvents = ['click', 'touchstart', 'keydown', 'scroll', 'wheel', 'pointerdown'];
+    gestureEvents.forEach((evt) => {
+      window.addEventListener(evt, enableAudio, { passive: true });
+    });
+
+    // IntersectionObserver: plays when in view, pauses when out of view, replays when returning
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.15) {
+          // User is on this part of the screen -> play
+          if (video.ended) {
+            video.currentTime = 0;
+          }
+          video.muted = false;
+          video.volume = 1.0;
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              // If browser blocks unmuted autoplay without prior gesture,
+              // play muted first and immediately unmute on the very next movement/scroll
+              video.muted = true;
+              video.play().then(() => {
+                const unmuteOnce = () => {
+                  if (videoRef.current) {
+                    videoRef.current.muted = false;
+                    videoRef.current.volume = 1.0;
+                  }
+                  gestureEvents.forEach((e) => window.removeEventListener(e, unmuteOnce));
+                };
+                gestureEvents.forEach((e) => {
+                  window.addEventListener(e, unmuteOnce, { passive: true, once: true });
+                });
+              }).catch(() => {});
+            });
+          }
+        } else {
+          // User scrolled away from this part of the screen -> pause
+          if (!video.paused) {
+            video.pause();
+          }
+        }
+      },
+      {
+        threshold: [0, 0.15, 0.4, 0.7, 1.0],
+      }
+    );
+
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+      gestureEvents.forEach((evt) => {
+        window.removeEventListener(evt, enableAudio);
+      });
+    };
   }, []);
 
   return (
-    <section 
+    <section
       ref={containerRef}
+      className="glazing-milk-exploded-section"
       style={{
         position: 'relative',
-        height: '240vh',
-        backgroundColor: '#FAF6F0',
-        color: '#3A2E2B'
+        // Background matches the video's exact warm silk tones (#D8C8B7 on left, #C6B39E on right, #E5DACD center)
+        background: `
+          radial-gradient(ellipse 90% 80% at 50% 55%, #E5DACD 0%, #DBCBBA 40%, #CFBDAA 75%, transparent 100%),
+          linear-gradient(to right, #D8C8B7 0%, #E0D3C4 35%, #D7C6B3 65%, #C6B39E 100%)
+        `,
+        padding: '3.5rem 0 0.5rem 0', // Compact bottom padding to eliminate dead space before cards
+        overflow: 'hidden',
+        width: '100%',
       }}
     >
-      <div 
+      {/* Top transition: smoothly dissolves from page cream (#F9F6F0) into the silk atmosphere */}
+      <div
         style={{
-          position: 'sticky',
+          position: 'absolute',
           top: 0,
-          height: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflow: 'hidden',
-          padding: '0 24px'
+          left: 0,
+          right: 0,
+          height: '80px',
+          background: 'linear-gradient(to bottom, #F9F6F0 0%, transparent 100%)',
+          pointerEvents: 'none',
+          zIndex: 3,
+        }}
+      />
+
+      {/* Bottom transition: smoothly dissolves into page cream (#F9F6F0) right above the cards */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '60px',
+          background: 'linear-gradient(to top, #F9F6F0 0%, transparent 100%)',
+          pointerEvents: 'none',
+          zIndex: 3,
+        }}
+      />
+
+      {/* Editorial Header */}
+      <div
+        style={{
+          maxWidth: '840px',
+          margin: '0 auto 1.8rem auto',
+          textAlign: 'center',
+          position: 'relative',
+          zIndex: 4,
+          padding: '0 4vw',
         }}
       >
-        <div style={{ textAlign: 'center', zIndex: 10, marginBottom: '16px' }}>
-          <span 
-            style={{
-              fontSize: '11px',
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: '#3A2E2B',
-              border: '1px solid rgba(58, 46, 43, 0.25)',
-              borderRadius: '9999px',
-              padding: '4px 16px',
-              display: 'inline-block',
-              marginBottom: '10px'
-            }}
-          >
-            Formulation Architecture
-          </span>
-          <h2 
-            style={{
-              fontFamily: 'Cormorant Garamond, serif',
-              fontSize: 'clamp(28px, 4vw, 48px)',
-              fontWeight: 400,
-              margin: 0,
-              color: '#3A2E2B'
-            }}
-          >
-            Anatomy of the Glazing Milk
-          </h2>
-        </div>
+        <h2
+          style={{
+            fontFamily: 'var(--font-serif-display)',
+            fontSize: 'clamp(2rem, 4.5vw, 3.5rem)',
+            fontWeight: 400,
+            color: '#2E221F',
+            margin: '0 0 0.75rem 0',
+            lineHeight: 1.15,
+            letterSpacing: '-0.01em',
+          }}
+        >
+          Anatomy of the Glazing Milk
+        </h2>
 
-        <div 
+        <p
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'clamp(0.88rem, 1.2vw, 1.02rem)',
+            color: 'rgba(58, 46, 43, 0.78)',
+            maxWidth: '580px',
+            margin: '0 auto',
+            lineHeight: 1.65,
+          }}
+        >
+          French alpine rose stem cells and micronized ceramides suspended in delicate balance to drench skin in barrier-strengthening dew.
+        </p>
+      </div>
+
+      {/* Expanded Cinematic Video Stage */}
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '1540px', // Expands across the viewport
+          margin: '0 auto',
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '0 2vw',
+          zIndex: 2,
+        }}
+      >
+        {/* Soft Ambient Glow Halo behind the floating droplets */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: '-10%',
+            background: 'radial-gradient(ellipse 75% 65% at 50% 50%, rgba(255, 250, 244, 0.9) 0%, rgba(240, 227, 214, 0.5) 45%, transparent 80%)',
+            pointerEvents: 'none',
+            zIndex: 1,
+          }}
+        />
+
+        {/* Video Wrapper */}
+        <div
           style={{
             position: 'relative',
             width: '100%',
-            maxWidth: '1000px',
-            height: '65vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+            aspectRatio: '16 / 9',
+            backgroundColor: 'transparent',
+            overflow: 'visible',
+            zIndex: 2,
           }}
         >
-          <div 
+          <video
+            ref={videoRef}
+            playsInline
+            loop
+            preload="auto"
             style={{
               width: '100%',
-              maxWidth: '420px',
               height: '100%',
-              borderRadius: '28px',
-              overflow: 'hidden',
-              boxShadow: '0 20px 50px rgba(58, 46, 43, 0.1)',
-              backgroundColor: '#EDE7DE'
+              objectFit: 'contain',
+              display: 'block',
+              backgroundColor: 'transparent',
+              pointerEvents: 'none', // Prevents click-to-pause and native controls
+              // Wide soft feather mask: dissolves the outer perimeter so the video merges invisibly with the background
+              WebkitMaskImage: 'radial-gradient(ellipse 94% 90% at 50% 50%, #000000 70%, rgba(0, 0, 0, 0.85) 85%, rgba(0, 0, 0, 0.35) 94%, transparent 100%)',
+              maskImage: 'radial-gradient(ellipse 94% 90% at 50% 50%, #000000 70%, rgba(0, 0, 0, 0.85) 85%, rgba(0, 0, 0, 0.35) 94%, transparent 100%)',
             }}
           >
-            <video
-              ref={videoRef}
-              src="/videos/glazing-milk-exploded.mp4"
-              playsInline
-              muted
-              preload="auto"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover'
-              }}
-            />
-          </div>
-
-          {annotations.map((item) => {
-            const isVisible = progress >= item.start && progress <= item.end;
-            return (
-              <div
-                key={item.id}
-                style={{
-                  position: 'absolute',
-                  ...item.position,
-                  maxWidth: '280px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.85)',
-                  backdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(58, 46, 43, 0.12)',
-                  borderRadius: '18px',
-                  padding: '16px 20px',
-                  boxShadow: '0 12px 30px rgba(58, 46, 43, 0.08)',
-                  opacity: isVisible ? 1 : 0,
-                  transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(12px) scale(0.96)',
-                  transition: 'opacity 0.35s ease, transform 0.35s ease',
-                  pointerEvents: isVisible ? 'auto' : 'none',
-                  zIndex: 20
-                }}
-              >
-                <span 
-                  style={{
-                    fontSize: '10px',
-                    letterSpacing: '0.14em',
-                    textTransform: 'uppercase',
-                    fontWeight: 600,
-                    color: '#8C6D62'
-                  }}
-                >
-                  {item.badge}
-                </span>
-                <h4 
-                  style={{
-                    fontFamily: 'Cormorant Garamond, serif',
-                    fontSize: '19px',
-                    margin: '4px 0 6px 0',
-                    color: '#3A2E2B'
-                  }}
-                >
-                  {item.title}
-                </h4>
-                <p 
-                  style={{
-                    fontSize: '12px',
-                    lineHeight: '1.5',
-                    color: 'rgba(58, 46, 43, 0.75)',
-                    margin: 0
-                  }}
-                >
-                  {item.desc}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-
-        <div 
-          style={{
-            position: 'absolute',
-            bottom: '20px',
-            fontSize: '11px',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            color: 'rgba(58, 46, 43, 0.45)'
-          }}
-        >
-          {progress < 0.9 ? 'Scroll to disassemble formula' : 'Formula Breakdown Complete'}
+            <source src="/glazing-milk-exploded.mp4" type="video/mp4" />
+            <source src="/videos/glazing-milk-exploded.mp4" type="video/mp4" />
+            <source src="/glazing-milk-exploded.mp4.mp4" type="video/mp4" />
+            Your browser does not support HTML5 video playback.
+          </video>
         </div>
       </div>
     </section>

@@ -24,8 +24,8 @@ export default function ProductSection({ onAddToCart, onQuickView }) {
       {/* Scroll-driven Glazing Milk Anatomy Exploded View */}
       <ExplodedGlazingMilkVideo />
 
-      {/* Standalone Carousel Cards */}
-      <div className="section-padding" style={{ paddingTop: '3rem' }}>
+      {/* Standalone Carousel Cards with compact top spacing */}
+      <div style={{ padding: '0.5rem 4vw 4.5rem 4vw' }}>
         <ProductCarousel
           products={DEFAULT_CAROUSEL_PRODUCTS}
           onAddToCart={onAddToCart}

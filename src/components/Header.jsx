@@ -11,10 +11,12 @@ import EloraLogo from './EloraLogo';
 export default function Header({
   cartCount = 0,
   onOpenCart,
+  onOpenSearch,
+  onOpenAccount,
   introFinished = false,
+  onNavigate,
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [searchModalOpen, setSearchModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +28,10 @@ export default function Header({
 
   const scrollToSection = (e, href) => {
     e.preventDefault();
+    if (onNavigate) {
+      onNavigate(href);
+      return;
+    }
     const element = document.querySelector(href);
     if (element) {
       const offset = 70;
@@ -80,6 +86,10 @@ export default function Header({
             className="header-logo-anchor"
             onClick={(e) => {
               e.preventDefault();
+              if (onNavigate) {
+                onNavigate('#');
+                return;
+              }
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             aria-label="Élora Skin & Beauty Home"
@@ -101,22 +111,40 @@ export default function Header({
 
         {/* Right Zone: SEARCH, ACCOUNT, BAG (N) */}
         <div className="header-right">
-          {/* Search Action */}
+          {/* Search Action Desktop */}
           <button
             className="header-nav-link header-action-text desktop-only"
-            onClick={() => setSearchModalOpen(true)}
+            onClick={onOpenSearch}
             aria-label="Search products"
           >
             SEARCH
           </button>
 
-          {/* Account Action */}
+          {/* Search Action Mobile */}
+          <button
+            className="header-search-btn-mobile"
+            onClick={onOpenSearch}
+            aria-label="Search products"
+          >
+            <Search size={18} />
+          </button>
+
+          {/* Account Action Desktop */}
           <button
             className="header-nav-link header-action-text desktop-only"
-            onClick={() => alert('Élora Account portal: Please log in or register.')}
+            onClick={onOpenAccount}
             aria-label="User Account"
           >
             ACCOUNT
+          </button>
+
+          {/* Account Action Mobile */}
+          <button
+            className="header-search-btn-mobile"
+            onClick={onOpenAccount}
+            aria-label="User Account"
+          >
+            <User size={18} />
           </button>
 
           {/* Bag with Count Badge */}
@@ -130,58 +158,6 @@ export default function Header({
           </button>
         </div>
       </header>
-
-      {/* Quick Search Modal */}
-      {searchModalOpen && (
-        <div
-          className="drawer-overlay is-open"
-          onClick={() => setSearchModalOpen(false)}
-          style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '10vh' }}
-        >
-          <div
-            className="search-modal-box"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid var(--color-border)', paddingBottom: '12px' }}>
-              <Search size={18} color="#776863" />
-              <input
-                type="text"
-                placeholder="Search the collection (e.g. Hero Serum, Dew Mist)..."
-                autoFocus
-                className="search-modal-input"
-              />
-              <button
-                onClick={() => setSearchModalOpen(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-espresso)' }}
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div style={{ marginTop: '1rem', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.74rem', color: '#776863' }}>Popular:</span>
-              {['The Hero Serum', 'Crème Lumineuse', 'Dew Mist', 'Peptide Lip Tint'].map((term) => (
-                <button
-                  key={term}
-                  onClick={() => setSearchModalOpen(false)}
-                  style={{
-                    background: '#F4EFE7',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: '9999px',
-                    padding: '4px 10px',
-                    fontSize: '0.72rem',
-                    cursor: 'pointer',
-                    color: 'var(--color-espresso)'
-                  }}
-                >
-                  {term}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-
     </>
   );
 }

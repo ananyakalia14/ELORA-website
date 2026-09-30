@@ -3031,5 +3031,1563 @@ h1, h2, h3, h4, .font-serif {
   }
 }
 
+/* ==========================================================================
+   RHODE-STYLE SLIDE-OUT SEARCH DRAWER FOR ÉLORA
+   ========================================================================== */
 
+/* 1. Backdrop: full-screen dark scrim (fixed inset-0 bg-black/40 backdrop-blur-sm z-40) */
+.search-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1040;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease-in-out;
+}
+
+.search-drawer-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 2. Slide-over Panel:
+   Fixed top-0 right-0 h-full z-50, w-full, max-w-[460px], bg-[#FAF6F0]
+   Smooth entrance animation: translate-x-full -> translate-x-0 (duration-300 ease-in-out) */
+.search-drawer-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  height: 100dvh;
+  width: 100%;
+  max-width: 460px;
+  background-color: #FAF6F0;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 40px rgba(58, 46, 43, 0.15);
+  transform: translateX(100%);
+  transition: transform 300ms ease-in-out;
+  overflow: hidden;
+}
+
+.search-drawer-panel.is-open {
+  transform: translateX(0);
+}
+
+/* Header Bar: Centered "search", Right-aligned "✕" */
+.search-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 1.1rem 1.5rem 0.75rem 1.5rem;
+  min-height: 52px;
+}
+
+.search-header-spacer {
+  width: 32px;
+  height: 32px;
+}
+
+.search-drawer-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-sans);
+  font-size: 0.875rem; /* text-sm */
+  letter-spacing: 0.05em; /* tracking-wide */
+  color: rgba(58, 46, 43, 0.8); /* text-[#3A2E2B]/80 */
+  font-weight: 500;
+  text-transform: lowercase;
+  margin: 0;
+  pointer-events: none;
+}
+
+.search-drawer-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.125rem; /* text-lg */
+  color: #3A2E2B;
+  padding: 0.5rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.search-drawer-close-btn:hover {
+  opacity: 0.6;
+}
+
+/* Search Input Field:
+   border border-[#3A2E2B]/15 bg-white px-4 py-3 text-sm text-[#3A2E2B] placeholder:text-[#3A2E2B]/40 focus:outline-none focus:border-[#3A2E2B]/40 */
+.search-drawer-input-wrapper {
+  padding: 0 1.5rem 1rem 1.5rem;
+}
+
+.search-drawer-input-container {
+  display: flex;
+  align-items: center;
+  background-color: #FFFFFF;
+  border: 1px solid rgba(58, 46, 43, 0.15);
+  border-radius: 0.75rem; /* rounded-xl */
+  padding: 0.75rem 1rem; /* px-4 py-3 */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-drawer-input-container:focus-within {
+  border-color: rgba(58, 46, 43, 0.4);
+  box-shadow: 0 0 0 1px rgba(58, 46, 43, 0.1);
+}
+
+.search-drawer-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: 0.875rem; /* text-sm */
+  color: #3A2E2B;
+}
+
+.search-drawer-input::placeholder {
+  color: rgba(58, 46, 43, 0.4); /* placeholder:text-[#3A2E2B]/40 */
+}
+
+.search-input-clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(58, 46, 43, 0.4);
+  font-size: 0.875rem;
+  padding: 2px 4px;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.search-input-clear-btn:hover {
+  color: #3A2E2B;
+}
+
+/* Scrollable Content Body */
+.search-drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.25rem 1.5rem 1.25rem 1.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 3. Suggestions List:
+   Section Header: "suggestions:" (lowercase, text-xs tracking-wider font-semibold text-[#3A2E2B] mb-3)
+   Vertical List: Stacked, clickable lowercase terms (text-xs md:text-sm text-[#3A2E2B]/80 hover:text-[#3A2E2B] cursor-pointer py-1.5 transition-colors) */
+.search-drawer-section-title {
+  font-family: var(--font-sans);
+  font-size: 0.75rem; /* text-xs */
+  letter-spacing: 0.08em; /* tracking-wider */
+  font-weight: 600;
+  color: #3A2E2B;
+  text-transform: lowercase;
+  margin-bottom: 0.75rem; /* mb-3 */
+}
+
+.search-suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.search-suggestion-item {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem; /* text-xs */
+  color: rgba(58, 46, 43, 0.8); /* text-[#3A2E2B]/80 */
+  cursor: pointer;
+  padding: 0.375rem 0; /* py-1.5 */
+  text-transform: lowercase;
+  background: none;
+  border: none;
+  text-align: left;
+  display: block;
+  width: 100%;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+@media (min-width: 768px) {
+  .search-suggestion-item {
+    font-size: 0.875rem; /* md:text-sm */
+  }
+}
+
+.search-suggestion-item:hover {
+  color: #3A2E2B; /* hover:text-[#3A2E2B] */
+  transform: translateX(3px);
+}
+
+/* Search Results UI */
+.search-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.search-results-count {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: rgba(58, 46, 43, 0.7);
+  font-weight: 500;
+}
+
+.search-reset-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  color: rgba(58, 46, 43, 0.7);
+  text-transform: lowercase;
+  transition: color 0.2s ease;
+}
+
+.search-reset-link:hover {
+  color: #3A2E2B;
+}
+
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.search-product-card {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.625rem;
+  border-radius: 0.75rem;
+  background-color: #FFFFFF;
+  border: 1px solid rgba(58, 46, 43, 0.08);
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.search-product-card:hover {
+  border-color: rgba(58, 46, 43, 0.2);
+  box-shadow: 0 4px 14px rgba(58, 46, 43, 0.06);
+  transform: translateY(-1px);
+}
+
+.search-product-thumb-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.5rem;
+  background-color: #FAF6F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.search-product-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.search-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-product-category {
+  display: block;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(58, 46, 43, 0.6);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.search-product-title {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #3A2E2B;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-product-price {
+  font-size: 0.75rem;
+  color: #3A2E2B;
+  font-weight: 500;
+}
+
+.search-quick-add-btn {
+  background-color: #FAF6F0;
+  border: 1px solid rgba(58, 46, 43, 0.15);
+  border-radius: 9999px;
+  padding: 0.35rem 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: #3A2E2B;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.search-quick-add-btn:hover {
+  background-color: #3A2E2B;
+  color: #FFFFFF;
+  border-color: #3A2E2B;
+}
+
+.search-empty-state {
+  padding: 1.5rem 0.5rem;
+  text-align: center;
+}
+
+.search-empty-text {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  color: #3A2E2B;
+  margin-bottom: 0.5rem;
+}
+
+.search-empty-subtext {
+  font-size: 0.78125rem;
+  color: rgba(58, 46, 43, 0.65);
+  line-height: 1.5;
+}
+
+.search-empty-highlight {
+  text-decoration: underline;
+  cursor: pointer;
+  color: #3A2E2B;
+  font-weight: 500;
+}
+
+/* 4. Pinned Bottom Recommendation Bar:
+   Docked at bottom (border-t border-[#3A2E2B]/10 p-4 bg-[#FAF6F0] flex items-center gap-3)
+   Micro product thumbnail (w-8 h-8 object-contain)
+   Product title: uppercase tracking-wider text-[11px] font-medium text-[#3A2E2B] */
+.search-drawer-bottom-bar {
+  margin-top: auto;
+  border-top: 1px solid rgba(58, 46, 43, 0.1); /* border-t border-[#3A2E2B]/10 */
+  padding: 1rem; /* p-4 */
+  background-color: #FAF6F0; /* bg-[#FAF6F0] */
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* gap-3 */
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  user-select: none;
+}
+
+.search-drawer-bottom-bar:hover {
+  background-color: #F4EFE7;
+}
+
+.search-bottom-thumb-wrap {
+  width: 2rem; /* w-8 (32px) */
+  height: 2rem; /* h-8 (32px) */
+  border-radius: 4px;
+  background-color: #FFFFFF;
+  border: 1px solid rgba(58, 46, 43, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.search-bottom-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* object-contain */
+}
+
+.search-bottom-title {
+  font-family: var(--font-sans);
+  font-size: 11px; /* text-[11px] */
+  letter-spacing: 0.08em; /* tracking-wider */
+  font-weight: 500;
+  color: #3A2E2B;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.search-bottom-arrow {
+  color: rgba(58, 46, 43, 0.5);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.search-drawer-bottom-bar:hover .search-bottom-arrow {
+  transform: translateX(3px);
+  color: #3A2E2B;
+}
+
+/* Mobile search trigger styling in header */
+.header-search-btn-mobile {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: var(--color-espresso);
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.header-search-btn-mobile:hover {
+  opacity: 0.65;
+}
+
+@media (max-width: 768px) {
+  .header-search-btn-mobile {
+    display: inline-flex;
+  }
+}
+
+/* ==========================================================================
+   ÉLORA LUXURY ACCOUNT PORTAL (MATCHING INTRAVENOUS OPTIMISED MOCKUP)
+   ========================================================================== */
+
+.elora-account-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(20, 14, 12, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.elora-account-container {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  background-color: #D8C6B9;
+  background-image: radial-gradient(circle at 75% 30%, rgba(255, 248, 242, 0.45) 0%, transparent 60%), linear-gradient(135deg, #DECBC0 0%, #CDB3A1 100%);
+  border-radius: 28px;
+  box-shadow: 0 25px 70px rgba(28, 20, 18, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.25);
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  overflow: hidden;
+  min-height: 560px;
+}
+
+/* Close Button */
+.elora-account-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #3A2E2B;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.elora-account-close-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: rotate(90deg) scale(1.05);
+}
+
+/* Left Visual Pane */
+.elora-account-visual-pane {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(235, 220, 209, 0.6) 0%, rgba(205, 179, 161, 0.6) 100%);
+}
+
+.elora-account-pouch-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Right Form Pane */
+.elora-account-form-pane {
+  position: relative;
+  padding: 3rem 3.5rem 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Brand Title Header */
+.elora-account-logo-block {
+  text-align: center;
+  margin-bottom: 2.25rem;
+}
+
+.elora-account-brand-title {
+  font-family: var(--font-serif-display);
+  font-size: 2.4rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  color: #2E221F;
+  margin: 0 0 0.25rem 0.22em; /* optical alignment */
+  line-height: 1.1;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.elora-account-brand-subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  color: rgba(58, 46, 43, 0.85);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+/* Forms */
+.elora-account-form {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.elora-account-error-msg {
+  background: rgba(220, 53, 69, 0.12);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  color: #8A1C27;
+  font-size: 0.76rem;
+  border-radius: 12px;
+  padding: 0.5rem 0.85rem;
+  text-align: center;
+}
+
+/* Frosted Pill Input */
+.elora-account-input-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: rgba(246, 237, 230, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 9999px;
+  padding: 0.75rem 1.15rem;
+  box-shadow: inset 0 1px 3px rgba(58, 46, 43, 0.04), 0 2px 6px rgba(58, 46, 43, 0.03);
+  transition: all 0.25s ease;
+}
+
+.elora-account-input-pill:focus-within {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(172, 126, 118, 0.65);
+  box-shadow: 0 0 0 3px rgba(172, 126, 118, 0.18), 0 4px 12px rgba(58, 46, 43, 0.06);
+}
+
+.elora-account-input-icon {
+  color: rgba(90, 74, 69, 0.6);
+  flex-shrink: 0;
+  margin-right: 0.65rem;
+}
+
+.elora-account-input-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  color: #3A2E2B;
+}
+
+.elora-account-input-field::placeholder {
+  color: rgba(90, 74, 69, 0.5);
+  font-weight: 400;
+}
+
+.elora-account-eye-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  color: rgba(90, 74, 69, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.elora-account-eye-toggle:hover {
+  color: #3A2E2B;
+}
+
+/* Dusty Rose Terracotta SIGN IN Button */
+.elora-account-submit-btn {
+  width: 100%;
+  background-color: #AC7E76;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.88rem 1.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(172, 126, 118, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.elora-account-submit-btn:hover:not(:disabled) {
+  background-color: #9A6F67;
+  box-shadow: 0 8px 24px rgba(172, 126, 118, 0.48);
+  transform: translateY(-1px);
+}
+
+.elora-account-submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 3px 10px rgba(172, 126, 118, 0.35);
+}
+
+.elora-account-submit-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.elora-account-btn-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.elora-account-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Sub-links below button */
+.elora-account-links-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.elora-account-text-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  color: rgba(58, 46, 43, 0.72);
+  transition: color 0.2s ease;
+  padding: 2px 4px;
+}
+
+.elora-account-text-link:hover {
+  color: #2E221F;
+}
+
+.elora-account-signup-prompt {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: rgba(58, 46, 43, 0.85);
+  margin: 0;
+}
+
+.elora-account-signup-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #3A2E2B;
+  text-decoration: underline;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.elora-account-signup-link:hover {
+  opacity: 0.7;
+}
+
+/* Subheading for Sign Up / Forgot */
+.elora-account-subheading {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.elora-account-subheading span {
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: #3A2E2B;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.elora-account-subheading p {
+  font-size: 0.76rem;
+  color: rgba(58, 46, 43, 0.7);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Success Confirmation Box */
+.elora-account-success-box {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(39, 103, 43, 0.2);
+  border-radius: 18px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.elora-account-success-icon {
+  width: 40px;
+  height: 40px;
+  background: #E8F5E9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem auto;
+}
+
+.elora-account-success-box h4 {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: #27672B;
+  margin: 0 0 0.5rem 0;
+}
+
+.elora-account-success-box p {
+  font-size: 0.78rem;
+  color: #3A2E2B;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Member Dashboard */
+.elora-account-dashboard {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.elora-account-dash-header {
+  text-align: center;
+}
+
+.elora-account-dash-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  color: #AC7E76;
+  background: rgba(172, 126, 118, 0.15);
+  padding: 3px 9px;
+  border-radius: 9999px;
+  margin-bottom: 0.35rem;
+}
+
+.elora-account-dash-welcome {
+  font-family: var(--font-serif-display);
+  font-size: 1.45rem;
+  color: #2E221F;
+  margin: 0 0 0.25rem 0;
+}
+
+.elora-account-dash-tier {
+  font-size: 0.76rem;
+  color: rgba(58, 46, 43, 0.7);
+  margin: 0;
+}
+
+.elora-account-reward-card {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(172, 126, 118, 0.3);
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  box-shadow: 0 4px 14px rgba(58, 46, 43, 0.05);
+}
+
+.elora-account-reward-sub {
+  display: block;
+  font-size: 0.7rem;
+  color: rgba(58, 46, 43, 0.65);
+  margin-top: 3px;
+}
+
+.elora-account-order-preview {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(58, 46, 43, 0.08);
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+}
+
+.elora-account-order-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #3A2E2B;
+  margin-bottom: 3px;
+}
+
+.elora-account-order-desc {
+  font-size: 0.7rem;
+  color: rgba(58, 46, 43, 0.65);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.elora-account-dash-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.elora-account-secondary-btn {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(58, 46, 43, 0.15);
+  border-radius: 9999px;
+  padding: 0.75rem 1.25rem;
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  color: #3A2E2B;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.elora-account-secondary-btn:hover {
+  background: #FFFFFF;
+  border-color: #3A2E2B;
+}
+
+.elora-account-signout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  color: rgba(58, 46, 43, 0.65);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+.elora-account-signout-btn:hover {
+  color: #8A1C27;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 860px) {
+  .elora-account-container {
+    grid-template-columns: 1fr;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 20px;
+  }
+
+  .elora-account-visual-pane {
+    height: 220px;
+    background: #DECBC0;
+  }
+
+  .elora-account-pouch-img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .elora-account-form-pane {
+    padding: 2rem 1.5rem;
+  }
+
+  .elora-account-brand-title {
+    font-size: 2rem;
+  }
+}
+
+/* ==========================================================================
+   FULL-SCREEN STANDALONE ACCOUNT PAGE (100VW x 100VH EXPERIENCE)
+   ========================================================================== */
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(1.015);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ==========================================================================
+   FULL-SCREEN STANDALONE ACCOUNT PAGE (LUXURY EDITORIAL SANCTUARY)
+   ========================================================================== */
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(1.008);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes floatPouch {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.elora-account-page-root {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 2200;
+  background-color: #E3D4C8;
+  background-image: url('/images/elora-account-bg-full.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  animation: pageFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 1. Seamless Merged Top Header Wrapper */
+.elora-account-header-wrapper {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background: rgba(246, 238, 232, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(58, 46, 43, 0.08);
+  box-shadow: 0 4px 20px rgba(58, 46, 43, 0.03);
+}
+
+.elora-account-header-wrapper .top-utility-bar {
+  background: transparent;
+  border-bottom: 1px solid rgba(58, 46, 43, 0.06);
+}
+
+.elora-account-header-wrapper .site-header {
+  background: transparent;
+  position: relative;
+  top: auto;
+  box-shadow: none;
+  border-bottom: none;
+}
+
+/* 2. Main Hero Layout Grid */
+.elora-account-page-body {
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 3rem 4vw 4rem 4vw;
+  min-height: calc(100vh - 130px);
+  box-sizing: border-box;
+  gap: 2.5rem;
+}
+
+/* Left Hero Column: Pristine Product Presentation */
+.elora-account-hero-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  pointer-events: none;
+}
+
+.elora-account-pouch-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 440px;
+}
+
+@media (min-width: 1025px) {
+  /* On desktop, the high-resolution pouch is rendered directly within the full-bleed photographic background */
+  .elora-account-pouch-hero-img {
+    display: none !important;
+  }
+}
+
+.elora-account-pouch-hero-img {
+  max-height: 56vh;
+  max-width: 320px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 24px 50px rgba(58, 46, 43, 0.2));
+  border-radius: 28px;
+  animation: floatPouch 6s ease-in-out infinite;
+  transition: transform 0.4s ease;
+}
+
+.elora-account-pouch-hero-img:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* Right Form Column: Floating Glassmorphic Sanctuary */
+.elora-account-form-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.elora-account-portal-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 252, 248, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 28px;
+  box-shadow: 
+    0 24px 64px rgba(58, 46, 43, 0.08),
+    0 4px 16px rgba(58, 46, 43, 0.03),
+    inset 0 1px 2px rgba(255, 255, 255, 0.95);
+  padding: 3rem 2.5rem;
+  box-sizing: border-box;
+}
+
+.elora-account-form-inner {
+  width: 100%;
+}
+
+/* Brand Logo Block inside Card */
+.elora-account-page-logo-block {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.elora-account-page-title {
+  font-family: var(--font-serif-display);
+  font-size: 2.6rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  color: #2E221F;
+  margin: 0 0 0.35rem 0.22em;
+  line-height: 1.1;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+.elora-account-page-subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  color: rgba(58, 46, 43, 0.8);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+/* Interactive Form */
+.elora-account-page-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+
+.elora-account-error-msg {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.25);
+  color: #8A1C27;
+  font-size: 0.76rem;
+  border-radius: 12px;
+  padding: 0.55rem 0.9rem;
+  text-align: center;
+}
+
+/* Frosted Pill Inputs */
+.elora-account-pill-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: rgba(246, 238, 232, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 9999px;
+  padding: 0.85rem 1.35rem;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6), 0 2px 6px rgba(58, 46, 43, 0.03);
+  transition: all 0.25s ease;
+}
+
+.elora-account-pill-input:focus-within {
+  background-color: #FFFFFF;
+  border-color: rgba(172, 126, 118, 0.75);
+  box-shadow: 0 0 0 3px rgba(172, 126, 118, 0.18), 0 4px 14px rgba(58, 46, 43, 0.06);
+}
+
+.elora-account-pill-icon {
+  color: rgba(90, 74, 69, 0.65);
+  flex-shrink: 0;
+  margin-right: 0.75rem;
+}
+
+.elora-account-pill-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: #2E221F;
+}
+
+.elora-account-pill-field::placeholder {
+  color: rgba(90, 74, 69, 0.52);
+  font-weight: 400;
+}
+
+.elora-account-eye-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: rgba(90, 74, 69, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.elora-account-eye-btn:hover {
+  color: #2E221F;
+}
+
+/* Terracotta Dusty Rose SIGN IN Button */
+.elora-account-page-submit-btn {
+  width: 100%;
+  background-color: #AC7E76;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.95rem 1.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(172, 126, 118, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.elora-account-page-submit-btn:hover:not(:disabled) {
+  background-color: #9A6F67;
+  box-shadow: 0 10px 28px rgba(172, 126, 118, 0.48);
+  transform: translateY(-1px);
+}
+
+.elora-account-page-submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(172, 126, 118, 0.35);
+}
+
+.elora-account-page-submit-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+/* Sub-links below Button */
+.elora-account-page-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+  text-align: center;
+}
+
+.elora-account-forgot-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: rgba(58, 46, 43, 0.72);
+  transition: color 0.2s ease;
+  padding: 3px 6px;
+}
+
+.elora-account-forgot-link:hover {
+  color: #2E221F;
+}
+
+.elora-account-signup-text {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  color: rgba(58, 46, 43, 0.85);
+  margin: 0;
+}
+
+.elora-account-signup-trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #2E221F;
+  text-decoration: underline;
+  padding: 0;
+  transition: opacity 0.2s ease;
+}
+
+.elora-account-signup-trigger:hover {
+  opacity: 0.7;
+}
+
+/* CREATE ACCOUNT VIEW */
+.elora-create-account-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.elora-create-account-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.elora-create-account-heading {
+  font-family: var(--font-sans);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2E221F;
+  margin: 0 0 0.35rem 0;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.elora-create-account-subheading {
+  font-size: 0.78rem;
+  color: rgba(58, 46, 43, 0.7);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.elora-create-account-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.elora-create-account-input-box {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 0.82rem 1.25rem;
+  border: 1px solid rgba(58, 46, 43, 0.12);
+  box-shadow: 0 2px 6px rgba(58, 46, 43, 0.03);
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+.elora-create-account-input-box:focus-within {
+  border-color: #3A2E2B;
+  box-shadow: 0 0 0 3px rgba(58, 46, 43, 0.08), 0 4px 12px rgba(58, 46, 43, 0.05);
+}
+
+.elora-create-account-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: #2E221F;
+}
+
+.elora-create-account-input::placeholder {
+  color: rgba(58, 46, 43, 0.48);
+  font-weight: 400;
+}
+
+.elora-register-btn-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.85rem;
+}
+
+.elora-register-pill-btn {
+  background-color: transparent;
+  border: 1.5px solid #3A2E2B;
+  border-radius: 9999px;
+  padding: 0.75rem 2.8rem;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: #3A2E2B;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.elora-register-pill-btn:hover:not(:disabled) {
+  background-color: #3A2E2B;
+  color: #FFFFFF;
+  border-color: #3A2E2B;
+  box-shadow: 0 6px 18px rgba(58, 46, 43, 0.2);
+  transform: translateY(-1px);
+}
+
+.elora-register-pill-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.elora-create-account-footer {
+  text-align: center;
+  margin-top: 0.85rem;
+}
+
+.elora-create-account-footer-text {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: rgba(58, 46, 43, 0.8);
+  margin: 0;
+}
+
+.elora-create-account-signin-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #2E221F;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.elora-create-account-signin-link:hover {
+  opacity: 0.7;
+}
+
+/* Luxury Site Footer inside Account Page - Soothing Ambient Fade */
+.elora-account-footer-wrap {
+  width: 100%;
+  position: relative;
+  z-index: 10;
+  margin-top: auto;
+  border-top: none;
+  background: transparent;
+}
+
+/* Ambient gradient transition bridging the warm page background and footer */
+.elora-account-footer-wrap::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 140px;
+  margin-bottom: -140px;
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(239, 230, 221, 0) 0%,
+    rgba(242, 234, 226, 0.35) 30%,
+    rgba(246, 240, 233, 0.75) 70%,
+    #F9F6F0 100%
+  );
+  pointer-events: none;
+}
+
+.elora-footer-account {
+  background-color: transparent !important;
+}
+
+.elora-footer-banner-account {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(249, 246, 240, 0.35) 25%,
+    rgba(249, 246, 240, 0.8) 65%,
+    #F9F6F0 100%
+  ) !important;
+  padding-top: 5.5rem !important;
+  padding-bottom: 2rem !important;
+}
+
+.elora-account-footer-wrap .elora-footer-main {
+  background-color: #F9F6F0;
+}
+
+/* Mobile & Tablet Full-Screen Adaptation */
+@media (max-width: 1024px) {
+  .elora-account-page-root {
+    background-image: 
+      radial-gradient(circle at 50% 15%, rgba(255, 252, 248, 0.6) 0%, transparent 60%),
+      linear-gradient(180deg, #EADCD0 0%, #DFCEBF 45%, #D4C1B0 100%);
+  }
+
+  .elora-account-page-body {
+    grid-template-columns: 1fr;
+    padding: 2.5rem 1.5rem 3rem 1.5rem;
+    gap: 1.75rem;
+    min-height: auto;
+  }
+
+  .elora-account-hero-col {
+    height: auto;
+    padding: 0;
+    pointer-events: auto;
+  }
+
+  .elora-account-pouch-frame {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-height: 250px;
+  }
+
+  .elora-account-pouch-hero-img {
+    display: block !important;
+    max-height: 240px;
+    max-width: 220px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 20px;
+    filter: drop-shadow(0 15px 30px rgba(58, 46, 43, 0.18));
+  }
+
+  .elora-account-portal-card {
+    padding: 2.25rem 1.5rem;
+    border-radius: 22px;
+  }
+
+  .elora-account-page-title {
+    font-size: 2.2rem;
+  }
+}
+
+/* ==========================================================================
+   FOOTER CONCIERGE & LINK STYLES
+   ========================================================================== */
+
+.elora-footer a {
+  color: #3A2E2B;
+}
+
+.elora-footer-concierge-link {
+  color: #3A2E2B !important;
+  text-decoration: underline !important;
+  text-decoration-color: rgba(58, 46, 43, 0.3) !important;
+  text-decoration-thickness: 1px !important;
+  text-underline-offset: 4px !important;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  display: inline-block;
+  transition: text-decoration-color 200ms ease, opacity 200ms ease;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.elora-footer-concierge-link:hover {
+  color: #3A2E2B !important;
+  text-decoration-color: rgba(58, 46, 43, 1) !important;
+}
 

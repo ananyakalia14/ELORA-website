@@ -9,6 +9,8 @@ import PhilosophySection from './components/PhilosophySection';
 import ValuesSection from './components/ValuesSection';
 import PressSection from './components/PressSection';
 import CartDrawer from './components/CartDrawer';
+import SearchDrawer from './components/SearchDrawer';
+import AccountPage from './components/AccountPage';
 import MobileStickyCta from './components/MobileStickyCta';
 import Footer from './components/Footer';
 import { PRODUCTS } from './data/products';
@@ -16,6 +18,12 @@ import { PRODUCTS } from './data/products';
 export default function App() {
   const [introFinished, setIntroFinished] = useState(false);
   const [landingVisible, setLandingVisible] = useState(false);
+
+  // Search drawer state
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Account modal state
+  const [accountOpen, setAccountOpen] = useState(false);
 
   // Cart state (starts empty with BAG (0) as requested)
   const [cartOpen, setCartOpen] = useState(false);
@@ -106,6 +114,8 @@ export default function App() {
         <Header
           cartCount={totalCartCount}
           onOpenCart={() => setCartOpen(true)}
+          onOpenSearch={() => setSearchOpen(true)}
+          onOpenAccount={() => setAccountOpen(true)}
           introFinished={introFinished}
         />
 
@@ -148,6 +158,32 @@ export default function App() {
           onAddToCart={handleAddToCart}
         />
       )}
+
+      {/* Slide-out Rhode-Style Search Drawer */}
+      <SearchDrawer
+        isOpen={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onSelectProduct={(product) => {
+          setSelectedProduct(product);
+          setSearchOpen(false);
+        }}
+        onAddToCart={handleAddToCart}
+      />
+
+      {/* Full-Screen Standalone Account Page */}
+      <AccountPage
+        isOpen={accountOpen}
+        onClose={() => setAccountOpen(false)}
+        onOpenCart={() => {
+          setAccountOpen(false);
+          setCartOpen(true);
+        }}
+        onOpenSearch={() => {
+          setAccountOpen(false);
+          setSearchOpen(true);
+        }}
+        cartCount={totalCartCount}
+      />
 
       {/* Dynamic Slide-Out Cart Drawer */}
       <CartDrawer
