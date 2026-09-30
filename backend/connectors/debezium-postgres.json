@@ -1,0 +1,22 @@
+{
+  "name": "omnimart-postgres-cdc",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "omnimart",
+    "database.password": "omnimart_dev",
+    "database.dbname": "omnimart",
+    "topic.prefix": "omnimart",
+    "table.include.list": "public.users,public.products,public.orders,public.order_items,public.payments,public.clickstream_events",
+    "plugin.name": "pgoutput",
+    "publication.name": "omnimart_pub",
+    "slot.name": "omnimart_slot",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": false,
+    "value.converter.schemas.enable": false,
+    "snapshot.mode": "initial",
+    "decimal.handling.mode": "double"
+  }
+}

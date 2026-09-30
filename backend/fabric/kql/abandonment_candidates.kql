@@ -1,0 +1,51 @@
+// Users who viewed a product 3+ times in 10 minutes without purchasing
+// Use case: Data Activator trigger → webhook → send discount code
+
+// --- Query 1: Abandonment candidates (current window) ---
+let purchase_users = 
+    Orders
+    | where Timestamp > ago(10m)
+    | distinct UserId, ProductId;
+ClickstreamEvents
+| where EventType == "page_view"
+| where Timestamp > ago(10m)
+| summarize Views = count(), FirstView = min(Timestamp), LastView = max(Timestamp) by UserId, ProductId
+| where Views >= 3
+| join kind=leftanti purchase_users on UserId, ProductId
+| extend MinutesBrowsing = datetime_diff('minute', LastView, FirstView)
+| order by Views desc
+
+// --- Query 2: Abandonment rate by product category (last hour) ---
+let viewers =
+    ClickstreamEvents
+    | where EventType == "page_view"
+    | where Timestamp > ago(1h)
+    | summarize Views = count() by UserId, ProductId;
+let buyers =
+    Orders
+    | where Timestamp > ago(1h)
+    | distinct UserId, ProductId;
+viewers
+| summarize TotalViewers = dcount(UserId) by ProductId
+| join kind=leftouter (
+    buyers | summarize Buyers = dcount(UserId) by ProductId
+) on ProductId
+| extend Buyers = coalesce(Buyers, 0)
+| extend AbandonmentRate = round(100.0 * (TotalViewers - Buyers) / TotalViewers, 1)
+| order by AbandonmentRate desc
+| take 20
+
+// --- Query 3: Cart abandonment (added to cart but no checkout in 30 min) ---
+let cart_adds =
+    ClickstreamEvents
+    | where EventType == "add_to_cart"
+    | where Timestamp > ago(30m)
+    | distinct UserId, ProductId;
+let recent_orders =
+    Orders
+    | where Timestamp > ago(30m)
+    | distinct UserId;
+cart_adds
+| join kind=leftanti recent_orders on UserId
+| summarize AbandonedItems = count() by UserId
+| order by AbandonedItems desc
