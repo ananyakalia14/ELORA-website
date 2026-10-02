@@ -170,7 +170,30 @@ async def root():
     if index_file.exists():
         return FileResponse(index_file)
     return {
-        "message": "Élora Omnimart API is running. Frontend draft has not been built to dist yet.",
+        "message": "Élora Omnimart API is running.",
+        "docs_url": "/docs",
+        "health_url": "/health",
+    }
+
+
+@app.get("/{full_path:path}", include_in_schema=False)
+async def catch_all(full_path: str):
+    # 1. If physical static file exists in dist or public, serve it
+    dist_file = FRONTEND_DIST / full_path
+    if dist_file.is_file():
+        return FileResponse(dist_file)
+
+    public_file = FRONTEND_PUBLIC / full_path
+    if public_file.is_file():
+        return FileResponse(public_file)
+
+    # 2. Otherwise serve frontend index.html for client-side routing
+    index_file = FRONTEND_DIST / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+
+    return {
+        "message": f"Resource /{full_path} not found.",
         "docs_url": "/docs",
         "health_url": "/health",
     }
