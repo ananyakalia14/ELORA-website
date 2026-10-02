@@ -5430,6 +5430,12 @@ h1, h2, h3, h4, .font-serif {
   background: rgba(170, 119, 106, 0.35);
   border-radius: 999px;
 }
+.pdp-back-short {
+  display: none;
+}
+.pdp-back-full {
+  display: inline;
+}
 
 /* ==========================================================================
    MOBILE PDP LUXURY STACKED LAYOUT (<= 768px)
@@ -5453,7 +5459,7 @@ h1, h2, h3, h4, .font-serif {
     z-index: 99999 !important;
   }
 
-  /* 1. Header: Frosted Glass Sticky Top Bar */
+  /* 1. Header: Frosted Glass Sticky Top Bar - Refined, Spacious, Never Congested */
   .elora-pdp-header {
     position: sticky !important;
     top: 0 !important;
@@ -5461,14 +5467,57 @@ h1, h2, h3, h4, .font-serif {
     right: 0 !important;
     z-index: 50 !important;
     width: 100% !important;
-    padding: 12px 18px !important;
-    background: rgba(249, 246, 240, 0.92) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
+    padding: 0 14px !important;
+    background: rgba(250, 246, 240, 0.94) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
     border-bottom: 1px solid rgba(58, 46, 43, 0.08) !important;
+    box-shadow: 0 2px 14px rgba(58, 46, 43, 0.04) !important;
     order: 1 !important;
     flex-shrink: 0 !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+
+  .elora-pdp-header button,
+  .elora-pdp-header a,
+  .elora-pdp-nav-btn {
+    padding: 6px 11px !important;
+    font-size: 0.65rem !important;
+    letter-spacing: 0.12em !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.82) !important;
+    border: 1px solid rgba(58, 46, 43, 0.1) !important;
+    box-shadow: 0 2px 8px rgba(58, 46, 43, 0.04) !important;
+    color: #3A2E2B !important;
+  }
+
+  .elora-pdp-header span.elora-pdp-logo,
+  .elora-pdp-header > span:not(button span) {
+    font-size: 1.2rem !important;
+    letter-spacing: 0.14em !important;
+    text-align: center !important;
+    flex: 1 1 auto !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    padding: 0 4px !important;
+  }
+
+  .pdp-back-short {
+    display: inline !important;
+  }
+  .pdp-back-full {
+    display: none !important;
   }
 
   /* 2. Hero Visual Layer: High-Fashion Dedicated Photo Display (Not Covered!) */
@@ -5546,8 +5595,34 @@ h1, h2, h3, h4, .font-serif {
     box-shadow: 0 -10px 35px rgba(58, 46, 43, 0.08) !important;
     max-height: none !important;
     overflow: visible !important;
-    padding: 24px 20px 90px 20px !important;
+    padding: 24px 20px 40px 20px !important;
     box-sizing: border-box !important;
+  }
+
+  /* 5. Footer: Elegantly pinned to the bottom of the scroll view */
+  .elora-pdp-footer {
+    position: relative !important;
+    order: 10 !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+    padding: 24px 16px 40px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    text-align: center !important;
+    font-size: 0.62rem !important;
+    letter-spacing: 0.14em !important;
+    color: #8A7E72 !important;
+    background: #FAF6F0 !important;
+    box-sizing: border-box !important;
+    border-top: 1px solid rgba(58, 46, 43, 0.08) !important;
+  }
+
+  .elora-pdp-footer span {
+    display: block !important;
+    white-space: normal !important;
   }
 }
 

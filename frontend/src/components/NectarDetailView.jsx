@@ -151,56 +151,71 @@ export default function NectarDetailView({
           boxSizing: 'border-box',
         }}
       >
+        {/* Left: Back Link */}
         <button
           onClick={onClose}
-          className="text-xs uppercase tracking-[0.2em] text-[#3A2E2B] font-medium hover:opacity-70 transition-opacity flex items-center gap-1.5"
+          className="text-xs uppercase tracking-[0.14em] text-[#3A2E2B] font-medium hover:opacity-70 transition-opacity flex items-center gap-1.5 elora-pdp-nav-btn"
           style={{
-            background: 'transparent',
-            border: 'none',
+            background: 'rgba(255, 255, 255, 0.75)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(58, 46, 43, 0.1)',
+            borderRadius: '100px',
             cursor: 'pointer',
-            fontSize: '0.75rem',
+            fontSize: '0.72rem',
             textTransform: 'uppercase',
-            letterSpacing: '0.2em',
+            letterSpacing: '0.14em',
             color: '#3A2E2B',
             fontWeight: 500,
-            transition: 'opacity 0.2s ease',
-            padding: '4px 0',
+            transition: 'all 0.2s ease',
+            padding: '7px 16px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
           }}
+          aria-label="Back to boutique shop"
         >
-          ← BACK TO SHOP
+          <span className="pdp-back-full">← BACK TO SHOP</span>
+          <span className="pdp-back-short">← SHOP</span>
         </button>
 
+        {/* Center: Brand Wordmark */}
         <span
-          className="font-serif text-2xl md:text-3xl text-[#3A2E2B] font-normal tracking-[0.14em]"
+          className="font-serif text-2xl md:text-3xl text-[#3A2E2B] font-normal tracking-[0.14em] elora-pdp-logo"
           style={{
             fontFamily: "var(--font-serif-display, 'Italiana', 'Cormorant Garamond', Georgia, serif)",
-            fontSize: 'clamp(1.6rem, 2.4vw, 2.2rem)',
+            fontSize: 'clamp(1.4rem, 2.2vw, 2.2rem)',
             color: '#3A2E2B',
             fontWeight: 400,
             textTransform: 'uppercase',
             letterSpacing: '0.14em',
+            textShadow: '0 2px 12px rgba(255, 255, 255, 0.8)',
           }}
         >
           ÉLORA
         </span>
 
+        {/* Right: Cart Status */}
         <button
           onClick={() => {
             if (onOpenCart) onOpenCart();
           }}
-          className="text-xs uppercase tracking-[0.2em] text-[#3A2E2B] font-medium hover:opacity-70 transition-opacity"
+          className="text-xs uppercase tracking-[0.14em] text-[#3A2E2B] font-medium hover:opacity-70 transition-opacity elora-pdp-nav-btn"
           style={{
-            background: 'transparent',
-            border: 'none',
+            background: 'rgba(255, 255, 255, 0.75)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(58, 46, 43, 0.1)',
+            borderRadius: '100px',
             cursor: 'pointer',
-            fontSize: '0.75rem',
+            fontSize: '0.72rem',
             textTransform: 'uppercase',
-            letterSpacing: '0.2em',
+            letterSpacing: '0.14em',
             color: '#3A2E2B',
             fontWeight: 500,
-            transition: 'opacity 0.2s ease',
-            padding: '4px 0',
+            transition: 'all 0.2s ease',
+            padding: '7px 16px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
           }}
+          aria-label={`View shopping bag containing ${cartCount} items`}
         >
           BAG ({cartCount})
         </button>
@@ -574,6 +589,30 @@ export default function NectarDetailView({
           </div>
         </div>
       </div>
+
+      {/* 4. Bottom Footer Note */}
+      <footer
+        className="relative z-20 w-full px-6 md:px-14 py-4 flex items-center justify-between text-[0.7rem] text-[#8A7E72] uppercase tracking-[0.16em] select-none elora-pdp-footer"
+        style={{
+          position: 'relative',
+          zIndex: 20,
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '1rem 3.5rem',
+          fontSize: '0.7rem',
+          color: '#8A7E72',
+          textTransform: 'uppercase',
+          letterSpacing: '0.16em',
+          userSelect: 'none',
+          boxSizing: 'border-box',
+        }}
+      >
+        <span>PARIS • NEW YORK</span>
+        <span>CLEAN FORMULA • DERMATOLOGIST TESTED</span>
+        <span>© 2026 ÉLORA</span>
+      </footer>
     </div>
   );
 
