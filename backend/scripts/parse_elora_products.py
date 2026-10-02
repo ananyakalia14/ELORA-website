@@ -6,9 +6,11 @@ import json
 import re
 from pathlib import Path
 
-FRONTEND_PRODUCTS_JS = Path(__file__).parent.parent / "ELORA-website" / "src" / "data" / "products.js"
-FRONTEND_CAROUSEL_JS = Path(__file__).parent.parent / "ELORA-website" / "src" / "data" / "carouselProducts.js"
-OUTPUT_JSON = Path(__file__).parent.parent / "data" / "elora_products.json"
+_base = Path(__file__).parent.parent
+FRONTEND_DIR = _base.parent / "frontend" if (_base.parent / "frontend").exists() else _base / "ELORA-website"
+FRONTEND_PRODUCTS_JS = FRONTEND_DIR / "src" / "data" / "products.js"
+FRONTEND_CAROUSEL_JS = FRONTEND_DIR / "src" / "data" / "carouselProducts.js"
+OUTPUT_JSON = _base / "data" / "elora_products.json"
 
 
 def parse_products():

@@ -9,7 +9,7 @@ __pycache__
 env/
 venv/
 node_modules/
-ELORA-website/node_modules/
-ELORA-website/dist/
+frontend/node_modules/
+frontend/dist/
 .agents
 *.log

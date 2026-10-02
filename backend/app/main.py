@@ -16,7 +16,9 @@ from app.routers import admin, auth, cart, orders, products, recommendations
 
 # Detect frontend directory whether run from backend, monorepo root, or legacy layout
 _base = Path(__file__).resolve().parent.parent
-if (_base.parent / "frontend").exists():
+if (_base / "frontend").exists():
+    FRONTEND_DIR = _base / "frontend"
+elif (_base.parent / "frontend").exists():
     FRONTEND_DIR = _base.parent / "frontend"
 elif (_base.parent / "src").exists():
     FRONTEND_DIR = _base.parent

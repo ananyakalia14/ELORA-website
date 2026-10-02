@@ -1,11 +1,11 @@
 # Stage 1: Build Frontend
-FROM node:20-alpine AS frontend-builder
+FROM node:22-alpine AS frontend-builder
 WORKDIR /build
 
-COPY ELORA-website/package*.json ./
+COPY frontend/package*.json ./
 RUN npm ci
 
-COPY ELORA-website/ ./
+COPY frontend/ ./
 RUN npm run build
 
 # Stage 2: Python FastAPI Backend
@@ -16,18 +16,18 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=8000
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend code, seed data, and scripts
-COPY app/ ./app/
-COPY scripts/ ./scripts/
-COPY data/ ./data/
-COPY migrations/ ./migrations/
+COPY backend/app/ ./app/
+COPY backend/scripts/ ./scripts/
+COPY backend/data/ ./data/
+COPY backend/migrations/ ./migrations/
 
 # Copy built frontend static dist and public files
-COPY --from=frontend-builder /build/dist ./ELORA-website/dist
-COPY --from=frontend-builder /build/public ./ELORA-website/public
+COPY --from=frontend-builder /build/dist ./frontend/dist
+COPY --from=frontend-builder /build/public ./frontend/public
 
 EXPOSE 8000
 
