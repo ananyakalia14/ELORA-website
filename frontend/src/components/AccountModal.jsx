@@ -555,7 +555,18 @@ export default function AccountModal({ isOpen, onClose, onOpenCart, onTrackOrder
                 <h3 className="elora-account-dash-welcome">
                   Welcome back, {currentUser.name || currentUser.email}
                 </h3>
-                <p className="elora-account-dash-tier">{currentUser.email}</p>
+                <div className="elora-account-dash-meta-row">
+                  <p className="elora-account-dash-tier">{currentUser.email}</p>
+                  <button
+                    type="button"
+                    className="elora-account-quick-logout-btn"
+                    onClick={handleSignOut}
+                    title="Log out of account"
+                    aria-label="Log out"
+                  >
+                    <LogOut size={11} /> Log out
+                  </button>
+                </div>
               </div>
 
               {/* Account Status Pill */}
