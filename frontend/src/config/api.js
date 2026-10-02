@@ -1,8 +1,11 @@
 /**
  * Central API configuration for Élora.
- * Automatically switches between local dev (http://127.0.0.1:8000)
- * and production cloud backend (via VITE_API_BASE_URL set in Vercel).
+ * Automatically targets local FastAPI dev server (http://127.0.0.1:8000) when running on localhost.
+ * In production cloud deployment, uses VITE_API_BASE_URL if configured, or falls back to client sanctuary mode.
  */
 export const API_BASE_URL =
   (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL)) ||
-  'http://127.0.0.1:8000';
+  (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://127.0.0.1:8000'
+    : '');
+

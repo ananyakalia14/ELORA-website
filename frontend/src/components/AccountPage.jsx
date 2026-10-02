@@ -52,9 +52,21 @@ export default function AccountPage({
       const localOrders = loadLocalOrders();
       setOrders(localOrders);
 
-      // Check real JWT token against PostgreSQL database
+      // Check real JWT token against PostgreSQL database or restore client session
       const token = localStorage.getItem('elora_token');
-      if (token) {
+      const storedUser = localStorage.getItem('elora_user');
+
+      if (token && storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          setCurrentUser(parsed);
+          setView('dashboard');
+        } catch {
+          // ignore
+        }
+      }
+
+      if (token && API_BASE_URL) {
         fetch(`${API_BASE_URL}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -72,6 +84,7 @@ export default function AccountPage({
                 token: token,
               };
               setCurrentUser(verifiedUser);
+              localStorage.setItem('elora_user', JSON.stringify(verifiedUser));
               setView('dashboard');
 
               // Fetch orders from database
@@ -81,7 +94,6 @@ export default function AccountPage({
                 .then((r) => (r.ok ? r.json() : []))
                 .then((dbOrders) => {
                   const combined = [...dbOrders];
-                  // merge local orders not already in db
                   const dbIds = new Set(dbOrders.map((o) => o.id));
                   for (const loc of localOrders) {
                     if (!dbIds.has(loc.id)) {
@@ -91,8 +103,7 @@ export default function AccountPage({
                   setOrders(combined);
                 })
                 .catch(() => setOrders(localOrders));
-            } else {
-              // Token invalid or expired, clear storage and show signin
+            } else if (res.status === 401) {
               localStorage.removeItem('elora_token');
               localStorage.removeItem('elora_user');
               setCurrentUser(null);
@@ -100,9 +111,9 @@ export default function AccountPage({
             }
           })
           .catch(() => {
-            setView('signin');
+            // Keep local user session
           });
-      } else {
+      } else if (!token && !storedUser) {
         setView('signin');
       }
 

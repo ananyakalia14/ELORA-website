@@ -19,10 +19,31 @@ export default function AccountModal({ isOpen, onClose, onOpenCart, onTrackOrder
   const [currentUser, setCurrentUser] = useState(null);
   const [orders, setOrders] = useState([]);
 
-  // Close on ESC key & prevent body scrolling
+  // Close on ESC key, prevent body scrolling & restore session
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      const storedUser = localStorage.getItem('elora_user');
+      const token = localStorage.getItem('elora_token');
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          setCurrentUser(parsed);
+          setView('dashboard');
+        } catch {
+          // ignore
+        }
+      } else {
+        setView('signin');
+      }
+
+      try {
+        const storedOrders = JSON.parse(localStorage.getItem('elora_orders') || '[]');
+        setOrders(storedOrders);
+      } catch {
+        // ignore
+      }
+
       const handleKeyDown = (e) => {
         if (e.key === 'Escape') onClose();
       };
