@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Star, Check, Sparkles, Minus, Plus } from 'lucide-react';
 
 export default function NectarDetailView({
@@ -72,7 +73,7 @@ export default function NectarDetailView({
     setOpenAccordion((prev) => (prev === id ? null : id));
   };
 
-  return (
+  const content = (
     <div
       className="fixed inset-0 z-50 w-full h-screen overflow-hidden bg-[#F9F6F0] flex flex-col justify-between elora-pdp-root"
       style={{
@@ -81,7 +82,7 @@ export default function NectarDetailView({
         right: 0,
         bottom: 0,
         left: 0,
-        zIndex: 9999,
+        zIndex: 99999,
         width: '100%',
         height: '100vh',
         height: '100dvh',
@@ -97,7 +98,7 @@ export default function NectarDetailView({
       aria-label={`${productData.name} Product Detail View`}
     >
       <div
-        className="absolute inset-0 w-full h-full pointer-events-none z-0"
+        className="absolute inset-0 w-full h-full pointer-events-none z-0 elora-pdp-bg-layer"
         style={{
           position: 'absolute',
           inset: 0,
@@ -575,4 +576,6 @@ export default function NectarDetailView({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(content, document.body) : content;
 }

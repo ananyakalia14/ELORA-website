@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Star, Check, Sparkles, ShieldCheck, Heart, Minus, Plus } from 'lucide-react';
 
 /**
@@ -126,7 +127,7 @@ export default function ElixirDetailView({
 
   const displayedVariant = hoveredVariant || selectedVariant;
 
-  return (
+  const content = (
     <div
       className="fixed inset-0 z-50 w-full h-screen overflow-hidden bg-[#F9F6F0] flex flex-col justify-between elora-pdp-root"
       style={{
@@ -135,7 +136,7 @@ export default function ElixirDetailView({
         right: 0,
         bottom: 0,
         left: 0,
-        zIndex: 9999,
+        zIndex: 99999,
         width: '100%',
         height: '100vh',
         height: '100dvh',
@@ -152,7 +153,7 @@ export default function ElixirDetailView({
     >
       {/* 1. Full-Bleed Background Visual */}
       <div
-        className="absolute inset-0 w-full h-full pointer-events-none z-0"
+        className="absolute inset-0 w-full h-full pointer-events-none z-0 elora-pdp-bg-layer"
         style={{
           position: 'absolute',
           inset: 0,
@@ -900,4 +901,6 @@ export default function ElixirDetailView({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(content, document.body) : content;
 }

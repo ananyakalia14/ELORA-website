@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Star, Check, Sparkles, ShieldCheck, Heart, Minus, Plus } from 'lucide-react';
-import ShadeDetailView from './ShadeDetailView';
-import { ELORA_SHADES } from '../data/shades';
 
 /**
  * Full-Screen Product Detail View for Élora Glazing Milk Essence
@@ -22,9 +21,6 @@ export default function GlazingMilkDetailView({
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [openAccordion, setOpenAccordion] = useState('ritual'); // 'ritual' open by default
-  const [selectedShade, setSelectedShade] = useState(ELORA_SHADES[1]); // Default to Rosé Glacé (02)
-  const [hoveredShade, setHoveredShade] = useState(null);
-  const [isShadePdpOpen, setIsShadePdpOpen] = useState(false);
 
   // Lock body scroll and listen for Escape key
   useEffect(() => {
@@ -88,7 +84,7 @@ export default function GlazingMilkDetailView({
     setOpenAccordion((prev) => (prev === id ? null : id));
   };
 
-  return (
+  const content = (
     <div
       className="fixed inset-0 z-50 w-full h-screen overflow-hidden bg-[#F9F6F0] flex flex-col justify-between elora-pdp-root"
       style={{
@@ -97,7 +93,7 @@ export default function GlazingMilkDetailView({
         right: 0,
         bottom: 0,
         left: 0,
-        zIndex: 9999,
+        zIndex: 99999,
         width: '100%',
         height: '100vh',
         height: '100dvh',
@@ -114,7 +110,7 @@ export default function GlazingMilkDetailView({
     >
       {/* 1. Full-Bleed Background Visual */}
       <picture
-        className="absolute inset-0 w-full h-full pointer-events-none z-0"
+        className="absolute inset-0 w-full h-full pointer-events-none z-0 elora-pdp-bg-layer"
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}
       >
         <source media="(max-width: 768px)" srcSet="/images/glazing-milk-martini-mobile.jpg" />
@@ -378,138 +374,57 @@ export default function GlazingMilkDetailView({
             {productData.description}
           </p>
 
-          {/* 4 Shade Swatches in Button Format (Each opens dedicated Shade Product Page) */}
+          {/* Authentic Reserve Format & Sizing Pill for Glazing Milk Essence */}
           <div
             style={{
               marginBottom: '1.4rem',
-              padding: '12px 16px',
-              borderRadius: '22px',
-              backgroundColor: 'rgba(255, 255, 255, 0.65)',
-              border: '1px solid rgba(170, 119, 106, 0.22)',
+              padding: '14px 18px',
+              borderRadius: '20px',
+              backgroundColor: 'rgba(255, 255, 255, 0.72)',
+              border: '1px solid rgba(170, 119, 106, 0.24)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: '0.75rem',
-              }}
-            >
+            <div>
               <span
                 style={{
-                  fontSize: '0.66rem',
+                  fontSize: '0.64rem',
                   textTransform: 'uppercase',
                   letterSpacing: '0.18em',
                   fontWeight: 600,
                   color: '#AA776A',
                   display: 'block',
+                  marginBottom: '2px',
                 }}
               >
-                THE 4 ÉLORA GLAZES
+                RESERVE FORMAT
               </span>
               <span
                 style={{
-                  fontSize: '0.74rem',
+                  fontSize: '0.82rem',
                   color: '#3A2E2B',
                   fontWeight: 600,
-                  letterSpacing: '0.03em',
+                  letterSpacing: '0.02em',
                 }}
               >
-                {(hoveredShade || selectedShade).name}
+                Standard Reserve
               </span>
             </div>
-
-            {/* 4 Circular Swatch Buttons matching reference image */}
-            <div
+            <span
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '8px',
+                fontSize: '0.74rem',
+                color: '#6E5C56',
+                fontWeight: 500,
+                letterSpacing: '0.05em',
+                background: 'rgba(170, 119, 106, 0.1)',
+                padding: '4px 10px',
+                borderRadius: '999px',
               }}
             >
-              {ELORA_SHADES.map((shade) => {
-                const isSelected = selectedShade.id === shade.id;
-                return (
-                  <button
-                    key={shade.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedShade(shade);
-                      setIsShadePdpOpen(true);
-                    }}
-                    onMouseEnter={() => setHoveredShade(shade)}
-                    onMouseLeave={() => setHoveredShade(null)}
-                    title={`Open ${shade.name} Product Page`}
-                    aria-label={`Open ${shade.name} Product Page`}
-                    style={{
-                      background: 'none',
-                      border: isSelected ? '1.5px solid #3A2E2B' : '1.5px solid transparent',
-                      borderRadius: '999px',
-                      padding: '4px',
-                      cursor: 'pointer',
-                      transition: 'all 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
-                      transform: isSelected ? 'scale(1.12)' : 'scale(1)',
-                      boxShadow: isSelected ? '0 4px 14px rgba(58, 46, 43, 0.22)' : 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '999px',
-                        backgroundColor: shade.hex,
-                        background: shade.gradient,
-                        boxShadow:
-                          'inset 2px 2px 4px rgba(255, 255, 255, 0.55), inset -2px -2px 4px rgba(0, 0, 0, 0.25), 0 3px 8px rgba(0,0,0,0.12)',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        transition: 'transform 0.2s ease',
-                      }}
-                      className="elora-swatch-circle elora-swatch-drop"
-                    >
-                      {/* Specular curved droplet reflection */}
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '6px',
-                          right: '8px',
-                          width: '9px',
-                          height: '5px',
-                          borderRadius: '999px',
-                          backgroundColor: 'rgba(255, 255, 255, 0.75)',
-                          transform: 'rotate(-28deg)',
-                          filter: 'blur(0.35px)',
-                          pointerEvents: 'none',
-                        }}
-                      />
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-            <div
-              style={{
-                marginTop: '0.45rem',
-                textAlign: 'center',
-              }}
-            >
-              <span
-                style={{
-                  fontSize: '0.62rem',
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: '#8A736C',
-                  fontWeight: 500,
-                }}
-              >
-                Click shade to view dedicated product page
-              </span>
-            </div>
+              140 ml / 4.7 fl oz
+            </span>
           </div>
 
           {/* Quantity Selector + Add To Bag Button */}
@@ -806,16 +721,8 @@ export default function GlazingMilkDetailView({
           </div>
         </div>
       </div>
-
-      {/* Dedicated Full-Screen Shade Product Detail Page */}
-      <ShadeDetailView
-        isOpen={isShadePdpOpen}
-        initialShade={selectedShade}
-        onClose={() => setIsShadePdpOpen(false)}
-        onAddToCart={onAddToCart}
-        onOpenCart={onOpenCart}
-        cartCount={cartCount}
-      />
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(content, document.body) : content;
 }

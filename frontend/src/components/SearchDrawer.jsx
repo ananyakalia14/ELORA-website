@@ -1,29 +1,117 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, ArrowRight, Sparkles, MapPin, Mail, HelpCircle } from 'lucide-react';
-import { PRODUCTS } from '../data/products';
 import { DEFAULT_CAROUSEL_PRODUCTS } from '../data/carouselProducts';
 
 /**
  * Slide-out Search Drawer for Élora Skin & Beauty
- * Replicating Rhode Skin search panel layout & interaction:
- * 1. Full-screen dark scrim backdrop (fixed inset-0 bg-black/40 backdrop-blur-sm z-40)
- * 2. Slide-over panel (fixed top-0 right-0 h-full w-full max-w-[460px] bg-[#FAF6F0] z-50)
- * 3. Header bar with centered lowercase "search" and right-aligned "✕"
- * 4. Rounded-xl input container with "Type here" placeholder
- * 5. Lowercase suggestions list
- * 6. Pinned bottom recommendation bar with micro packshot and "GLAZING MILK ESSENCE"
+ * Shows ONLY authentic, existing products and store pages.
  */
 
 const SUGGESTIONS = [
-  'peptide lip tint balm',
   'glazing milk essence',
+  'the glazed barrier elixir',
+  'peptide lip tint',
   'barrier repair nectar',
-  'crème lumineuse',
-  'alpine dew mist',
-  'botanical elixir',
+  'lip liner',
+  'the journal',
   'store locator',
   'contact us',
   'faq',
+];
+
+// Curated search index containing only authentic Élora Edit products and valid shades
+const AUTHENTIC_PRODUCTS = [
+  {
+    id: 'lumineuse',
+    name: 'GLAZING MILK ESSENCE',
+    subtitle: 'Milky ceramide essence for a glazed, barrier-strengthened finish',
+    category: 'Lait',
+    price: 115,
+    formattedPrice: '$115.00',
+    image: '/images/elora-glazing-milk.jpg',
+    keywords: 'glazing milk essence ceramide lait facial hydration barrier dew l\'essence standard reserve',
+    rawProduct: {
+      id: 'lumineuse',
+      name: 'GLAZING MILK ESSENCE',
+      category: 'lait',
+      price: 115,
+      image: '/images/elora-glazing-milk.jpg',
+      isGlazingMilk: true,
+      description: 'Milky ceramide essence for a glazed, barrier-strengthened finish',
+    },
+  },
+  {
+    id: 'elixir',
+    name: 'THE GLAZED BARRIER ELIXIR',
+    subtitle: 'Tinted skincare for a sheer, glazed finish',
+    category: 'Éclat',
+    price: 128,
+    formattedPrice: '$128.00',
+    image: '/images/products/elixir-packshot.jpg',
+    keywords: 'the glazed barrier elixir tinted skincare sheer glow éclat alpine rose cellular serum',
+    rawProduct: {
+      id: 'elixir',
+      name: 'THE GLAZED BARRIER ELIXIR',
+      category: 'éclat',
+      price: 128,
+      image: '/images/products/elixir-packshot.jpg',
+      description: 'Tinted skincare for a sheer, glazed finish',
+    },
+  },
+  {
+    id: 'brume',
+    name: 'PEPTIDE LIP TINT',
+    subtitle: 'Peptide lip tint with a soft, glossy finish',
+    category: 'Teinte',
+    price: 54,
+    formattedPrice: '$54.00',
+    image: '/images/products/mist-packshot.jpg',
+    keywords: 'peptide lip tint balm butterscotch cinnamon coffee lemon pistachio raspberry strawberry gloss treatment glaze teinte',
+    rawProduct: {
+      id: 'brume',
+      name: 'PEPTIDE LIP TINT',
+      category: 'teinte',
+      price: 54,
+      image: '/images/products/mist-packshot.jpg',
+      description: 'Peptide lip tint with a soft, glossy finish',
+    },
+  },
+  {
+    id: 'hero-serum',
+    name: 'COLOR, THE ÉLORA WAY',
+    subtitle: 'Precision contouring & shaping lip liner',
+    category: 'La Couleur',
+    price: 98,
+    formattedPrice: '$98.00',
+    image: '/images/elora-hero-serum.jpg',
+    keywords: 'color the elora way lip liner shape sculpt lean stretch flex spin move contour la couleur',
+    rawProduct: {
+      id: 'hero-serum',
+      name: 'COLOR, THE ÉLORA WAY',
+      category: 'la couleur',
+      price: 98,
+      image: '/images/elora-hero-serum.jpg',
+      description: 'A little flush, wherever you want it.',
+    },
+  },
+  {
+    id: 'nectar',
+    name: 'BARRIER REPAIR NECTAR',
+    subtitle: 'Alpine rose cellular infusion',
+    category: 'Nectar',
+    price: 48,
+    formattedPrice: '$48.00',
+    image: '/images/products/nectar-packshot.jpg',
+    keywords: 'barrier repair nectar alpine rose cellular infusion soothing calming treatment',
+    rawProduct: {
+      id: 'nectar',
+      name: 'BARRIER REPAIR NECTAR',
+      category: 'nectar',
+      price: 48,
+      image: '/images/products/nectar-packshot.jpg',
+      description: 'Alpine rose cellular infusion',
+    },
+  },
 ];
 
 export default function SearchDrawer({
@@ -31,6 +119,7 @@ export default function SearchDrawer({
   onClose,
   onSelectProduct,
   onAddToCart,
+  onNavigate,
 }) {
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
@@ -64,122 +153,58 @@ export default function SearchDrawer({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Combine products for search index
-  const allSearchableProducts = React.useMemo(() => {
-    const map = new Map();
-    // Add standard catalogue products
-    PRODUCTS.forEach((p) => {
-      map.set(p.name.toLowerCase(), {
-        id: p.id,
-        name: p.name,
-        subtitle: p.subtitle || p.category,
-        category: p.category,
-        price: p.price,
-        formattedPrice: `$${p.price}.00`,
-        image: p.image,
-        rawProduct: p,
-      });
-    });
-    // Add carousel items (e.g. Glazed Barrier Elixir, Barrier Repair Nectar)
-    DEFAULT_CAROUSEL_PRODUCTS.forEach((cp) => {
-      const key = cp.name.toLowerCase();
-      if (!map.has(key)) {
-        map.set(key, {
-          id: cp.id,
-          name: cp.name,
-          subtitle: cp.description,
-          category: cp.category,
-          price: cp.numericPrice || 98,
-          formattedPrice: cp.price,
-          image: cp.primaryImage,
-          rawProduct: {
-            id: cp.id,
-            name: cp.name,
-            subtitle: cp.description,
-            price: cp.numericPrice || 98,
-            image: cp.primaryImage,
-            description: cp.description,
-            category: cp.category,
-          },
-        });
-      }
-    });
-
-    // Explicitly guarantee Glazing Milk Essence exists in index
-    if (!map.has('glazing milk essence')) {
-      map.set('glazing milk essence', {
-        id: 'glazing-milk-essence',
-        name: 'GLAZING MILK ESSENCE',
-        subtitle: 'Ceramide-Infused Botanical Nutrient Veil',
-        category: 'Essence',
-        price: 44,
-        formattedPrice: '$44.00',
-        image: '/images/products/elora-glazing-milk.jpg',
-        rawProduct: {
-          id: 'glazing-milk-essence',
-          name: 'GLAZING MILK ESSENCE',
-          subtitle: 'Ceramide-Infused Botanical Nutrient Veil',
-          price: 44,
-          image: '/images/products/elora-glazing-milk.jpg',
-          category: 'Essence',
-          description: 'A nutrient-dense ceramide milk essence that drenches skin in barrier-strengthening botanical hydration for a dewy glazed gleam.',
-        },
-      });
-    }
-
-    return Array.from(map.values());
-  }, []);
-
-  // Filter products by query
+  // Filter products by query strictly against authentic catalogue
   const filteredProducts = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
 
-    // Check query terms
-    return allSearchableProducts.filter((p) => {
+    return AUTHENTIC_PRODUCTS.filter((p) => {
       const nameMatch = p.name.toLowerCase().includes(q);
       const subMatch = (p.subtitle || '').toLowerCase().includes(q);
       const catMatch = (p.category || '').toLowerCase().includes(q);
-      return nameMatch || subMatch || catMatch;
+      const keyMatch = (p.keywords || '').toLowerCase().includes(q);
+      return nameMatch || subMatch || catMatch || keyMatch;
     });
-  }, [query, allSearchableProducts]);
+  }, [query]);
 
   // Handle suggestion click
   const handleSuggestionClick = (term) => {
-    if (term === 'contact us') {
+    const t = term.toLowerCase().trim();
+    if (t === 'contact us' || t === 'contact') {
       onClose();
-      const footer = document.querySelector('footer');
-      if (footer) footer.scrollIntoView({ behavior: 'smooth' });
-    } else if (term === 'faq') {
+      if (onNavigate) {
+        onNavigate('#contact');
+      } else {
+        window.location.hash = '#contact';
+      }
+    } else if (t === 'faq' || t === 'faqs') {
       onClose();
-      const faqSec = document.querySelector('#clinical-accordion') || document.querySelector('footer');
-      if (faqSec) faqSec.scrollIntoView({ behavior: 'smooth' });
-    } else if (term === 'store locator') {
+      if (onNavigate) {
+        onNavigate('#faq');
+      } else {
+        window.location.hash = '#faq';
+      }
+    } else if (t === 'store locator' || t === 'stores') {
       onClose();
-      alert('Élora Boutiques: Flagship stores in Paris (Place Vendôme), New York (Madison Ave), Tokyo (Ginza), & London (Mayfair).');
+      if (onNavigate) {
+        onNavigate('#stores');
+      } else {
+        window.location.hash = '#stores';
+      }
+    } else if (t === 'the journal' || t === 'journal') {
+      onClose();
+      if (onNavigate) {
+        onNavigate('#journal');
+      } else {
+        window.location.hash = '#journal';
+      }
     } else {
       setQuery(term);
     }
   };
 
-  // Glazing milk product for bottom pinned bar
-  const glazingMilkProduct = {
-    id: 'glazing-milk-essence',
-    name: 'GLAZING MILK ESSENCE',
-    subtitle: 'Ceramide Nutrient Barrier Veil',
-    price: 44,
-    formattedPrice: '$44.00',
-    image: '/images/products/elora-glazing-milk.jpg',
-    rawProduct: {
-      id: 'glazing-milk-essence',
-      name: 'GLAZING MILK ESSENCE',
-      subtitle: 'Ceramide Nutrient Barrier Veil',
-      price: 44,
-      image: '/images/products/elora-glazing-milk.jpg',
-      category: 'Essence',
-      description: 'A nutrient-dense ceramide milk essence that drenches skin in barrier-strengthening botanical hydration for a dewy glazed gleam.',
-    },
-  };
+  // Glazing milk product for bottom pinned recommendation bar
+  const glazingMilkProduct = AUTHENTIC_PRODUCTS[0];
 
   const handleOpenGlazingMilk = () => {
     if (onSelectProduct) {
@@ -190,25 +215,21 @@ export default function SearchDrawer({
 
   return (
     <>
-      {/* 1. DRAWER ARCHITECTURE & OVERLAY:
-          Backdrop: Full-screen dark scrim (fixed inset-0 bg-black/40 backdrop-blur-sm z-40) */}
+      {/* 1. DRAWER ARCHITECTURE & OVERLAY */}
       <div
         className={`search-drawer-overlay ${isOpen ? 'is-open' : ''}`}
         onClick={onClose}
         aria-hidden={!isOpen}
       />
 
-      {/* Slide-over Panel:
-          Fixed on right edge (fixed top-0 right-0 h-full z-50 w-full max-w-[460px] bg-[#FAF6F0])
-          Smooth entrance animation (translate-x-0 when open, translate-x-full when closed) */}
+      {/* Slide-over Panel */}
       <aside
         className={`search-drawer-panel ${isOpen ? 'is-open' : ''}`}
         aria-label="Search Drawer"
         role="dialog"
         aria-modal="true"
       >
-        {/* 2. HEADER & INPUT:
-            Top Header Bar: Centered "search", Right-aligned "✕" */}
+        {/* 2. HEADER & INPUT */}
         <div className="search-drawer-header">
           <div className="search-header-spacer" aria-hidden="true" />
           <h2 className="search-drawer-title">search</h2>
@@ -332,7 +353,7 @@ export default function SearchDrawer({
                 <div className="search-empty-state">
                   <p className="search-empty-text">No direct product matches found for "{query}".</p>
                   <p className="search-empty-subtext">
-                    Try searching for botanical terms like <span className="search-empty-highlight" onClick={() => setQuery('milk')}>milk</span>, <span className="search-empty-highlight" onClick={() => setQuery('tint')}>tint</span>, <span className="search-empty-highlight" onClick={() => setQuery('serum')}>serum</span>, or <span className="search-empty-highlight" onClick={() => setQuery('creme')}>crème</span>.
+                    Try searching for botanical terms like <span className="search-empty-highlight" onClick={() => setQuery('milk')}>milk</span>, <span className="search-empty-highlight" onClick={() => setQuery('tint')}>tint</span>, <span className="search-empty-highlight" onClick={() => setQuery('elixir')}>elixir</span>, <span className="search-empty-highlight" onClick={() => setQuery('nectar')}>nectar</span>, or <span className="search-empty-highlight" onClick={() => setQuery('liner')}>liner</span>.
                   </p>
                 </div>
               )}
@@ -340,10 +361,7 @@ export default function SearchDrawer({
           )}
         </div>
 
-        {/* 4. PINNED BOTTOM RECOMMENDATION BAR:
-            Docked at bottom (border-t border-[#3A2E2B]/10 p-4 bg-[#FAF6F0] flex items-center gap-3)
-            Micro packshot (w-8 h-8 object-contain)
-            Product title (uppercase tracking-wider text-[11px] font-medium text-[#3A2E2B]) */}
+        {/* 4. PINNED BOTTOM RECOMMENDATION BAR */}
         <div
           className="search-drawer-bottom-bar"
           onClick={handleOpenGlazingMilk}

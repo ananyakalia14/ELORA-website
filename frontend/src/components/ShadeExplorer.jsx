@@ -199,7 +199,10 @@ export default function ShadeExplorer({ onAddToCart, onSelectShade, buttonText =
 
               <button
                 type="button"
-                onClick={() => setIsShadePdpOpen(true)}
+                onClick={() => {
+                  setIsShadeModalOpen(false);
+                  setIsShadePdpOpen(true);
+                }}
                 style={{
                   background: 'transparent',
                   border: 'none',

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Star, Check, Minus, Plus } from 'lucide-react';
 import { ELORA_SHADES } from '../data/shades';
 
@@ -82,9 +83,7 @@ export default function ShadeDetailView({
     setOpenAccordion((prev) => (prev === id ? null : id));
   };
 
-  const displayedShade = hoveredShade || activeShade;
-
-  return (
+  const content = (
     <div
       className="fixed inset-0 z-50 w-full h-screen overflow-hidden bg-[#F9F6F0] flex flex-col justify-between elora-pdp-root"
       style={{
@@ -93,7 +92,7 @@ export default function ShadeDetailView({
         right: 0,
         bottom: 0,
         left: 0,
-        zIndex: 99999,
+        zIndex: 100000,
         width: '100%',
         height: '100vh',
         height: '100dvh',
@@ -110,7 +109,7 @@ export default function ShadeDetailView({
     >
       {/* 1. Full-Bleed Background Visual with smooth reveal animation */}
       <div
-        className="absolute inset-0 w-full h-full pointer-events-none z-0"
+        className="absolute inset-0 w-full h-full pointer-events-none z-0 elora-pdp-bg-layer"
         style={{
           position: 'absolute',
           inset: 0,
@@ -772,4 +771,6 @@ export default function ShadeDetailView({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(content, document.body) : content;
 }

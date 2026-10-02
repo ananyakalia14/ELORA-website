@@ -1,28 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, Eye, EyeOff, Check, Package, LogOut, ShoppingBag } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Check, Package, LogOut, ShoppingBag, ShieldCheck, Sliders } from 'lucide-react';
 import Header from './Header';
 import Footer from './Footer';
 import { API_BASE_URL } from '../config/api';
 
-/**
- * Full-Screen Standalone Account Page for Élora Skin & Beauty
- * 
- * Design Architecture:
- * - Top: 100% Transparent luxury navigation header (SHOP, ABOUT, JOURNAL, centered Élora logo, SEARCH, ACCOUNT, BAG)
- * - Hero Wrap: Full-screen 2K sunlit plaster wall with diagonal palm shadows and hanging IV infusion pouch art
- * - Left Column: Spacer on desktop (pouch rendered directly in background), responsive pouch image on mobile
- * - Right Column: Form elements floating directly against the sunlit wall with NO container card box:
- *                 - Serif É L O R A logotype + SKIN & BEAUTY subtitle
- *                 - Frosted translucent pill inputs with Mail and Lock icons
- *                 - Terracotta rose #AA776A pill SIGN IN button
- *                 - Direct sublinks for password recovery and account creation
- * - Bottom: Full Élora luxury footer revealed smoothly on scroll down.
- */
 export default function AccountPage({
   isOpen,
   onClose,
   onOpenCart,
   onOpenSearch,
+  onOpenAdmin,
   cartCount = 0,
 }) {
   // Input states
@@ -383,11 +370,11 @@ export default function AccountPage({
           <div className="elora-account-hero-col">
             <div className="elora-account-pouch-frame">
               <img
-                src="/images/elora-iv-pouch.png"
+                src="/images/elora-new-pouch-raw.png"
                 alt="Élora Skin Nutrition Intravenously Optimised"
                 className="elora-account-pouch-hero-img"
                 onError={(e) => {
-                  e.currentTarget.src = '/images/elora-new-pouch-raw.png';
+                  e.currentTarget.src = '/images/elora-iv-pouch.png';
                 }}
               />
             </div>
@@ -694,15 +681,44 @@ export default function AccountPage({
             )}
 
             {/* VIEW 4: CLIENT ACCOUNT SANCTUARY */}
-            {view === 'dashboard' && currentUser && (
+            {view === 'dashboard' && currentUser && (() => {
+              const isAdmin = currentUser?.role === 'admin' || currentUser?.email?.toLowerCase() === 'admin@elora.com';
+              return (
               <div className="elora-account-dash-view">
                 <div className="elora-account-dash-header-block">
-                  <span className="elora-account-dash-pill">ÉLORA CLIENT PROFILE</span>
+                  <span className="elora-account-dash-pill">
+                    {isAdmin ? '👑 ÉLORA ATELIER EXECUTIVE' : 'ÉLORA CLIENT PROFILE'}
+                  </span>
                   <h3 className="elora-account-dash-name">
                     Welcome back, {currentUser.name || currentUser.email}
                   </h3>
                   <p className="elora-account-dash-subtitle">{currentUser.email}</p>
                 </div>
+
+                {/* Executive Admin Management Card (Visible ONLY to Admin Users) */}
+                {isAdmin && (
+                  <div className="elora-account-dash-card elora-account-admin-card">
+                    <div className="elora-account-admin-badge-row">
+                      <span className="elora-account-admin-badge">
+                        <ShieldCheck size={13} color="#D4AF37" /> ATELIER EXECUTIVE SUITE
+                      </span>
+                    </div>
+                    <h4 className="elora-account-admin-card-title">Atelier Administration & Operations</h4>
+                    <p className="elora-account-admin-card-desc">
+                      Manage boutique inventory stock, review customer order fulfillment queues, and monitor live sales performance.
+                    </p>
+                    <button
+                      type="button"
+                      className="elora-account-admin-launch-btn"
+                      onClick={() => {
+                        onClose();
+                        onOpenAdmin?.();
+                      }}
+                    >
+                      <Sliders size={14} /> Open Atelier Admin Console →
+                    </button>
+                  </div>
+                )}
 
                 {/* Account Status Card */}
                 <div className="elora-account-dash-card">
@@ -809,7 +825,8 @@ export default function AccountPage({
                   </button>
                 </div>
               </div>
-            )}
+              );
+            })()}
 
           </div>
         </div>

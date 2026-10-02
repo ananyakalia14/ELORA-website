@@ -12,7 +12,7 @@ import ElixirDetailView from './components/ElixirDetailView';
 import NectarDetailView from './components/NectarDetailView';
 import LipLinerDetailView from './components/LipLinerDetailView';
 import PhilosophySection from './components/PhilosophySection';
-import ScienceSection from './components/ScienceSection';
+
 import ValuesSection from './components/ValuesSection';
 import PressSection from './components/PressSection';
 import CartDrawer from './components/CartDrawer';
@@ -23,11 +23,15 @@ import MobileStickyCta from './components/MobileStickyCta';
 import EditorialComingSoon from './components/EditorialComingSoon';
 import AdminDashboard from './components/AdminDashboard';
 import Footer from './components/Footer';
+import LegalPage from './components/LegalPage';
 import { PRODUCTS } from './data/products';
 
 export default function App() {
   const [introFinished, setIntroFinished] = useState(false);
   const [landingVisible, setLandingVisible] = useState(false);
+
+  // Legal / Info page state (privacy, terms, accessibility, faq, contact)
+  const [legalPage, setLegalPage] = useState(null);
 
   // Search drawer state
   const [searchOpen, setSearchOpen] = useState(false);
@@ -66,6 +70,31 @@ export default function App() {
     setIntroFinished(true);
     setLandingVisible(true);
 
+    if (['privacy', 'privacy-policy'].includes(cleanHash)) {
+      setLegalPage('privacy');
+      window.history.replaceState(null, '', '#privacy');
+      return;
+    }
+    if (['terms', 'terms-of-service', 'tos'].includes(cleanHash)) {
+      setLegalPage('terms');
+      window.history.replaceState(null, '', '#terms');
+      return;
+    }
+    if (['accessibility', 'accessibility-statement'].includes(cleanHash)) {
+      setLegalPage('accessibility');
+      window.history.replaceState(null, '', '#accessibility');
+      return;
+    }
+    if (['faq', 'faqs', 'help'].includes(cleanHash)) {
+      setLegalPage('faq');
+      window.history.replaceState(null, '', '#faq');
+      return;
+    }
+    if (['contact', 'contact-us', 'concierge'].includes(cleanHash)) {
+      setLegalPage('contact');
+      window.history.replaceState(null, '', '#contact');
+      return;
+    }
     if (cleanHash === 'journal') {
       setComingSoon({ isOpen: true, type: 'journal' });
       window.history.replaceState(null, '', '#journal');
@@ -89,7 +118,7 @@ export default function App() {
 
     let targetId = cleanHash;
     if (cleanHash === 'story' || cleanHash === 'about') targetId = 'philosophy';
-    if (cleanHash === 'science' || cleanHash === 'cellular-science' || cleanHash === 'french-alpine-actives') targetId = 'science';
+
     if (cleanHash === 'shop') targetId = 'shop';
 
     const element =
@@ -129,8 +158,20 @@ export default function App() {
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
+  const closeAllProductViews = () => {
+    setGlazingMilkViewOpen(false);
+    setElixirViewOpen(false);
+    setNectarViewOpen(false);
+    setLipLinerViewOpen(false);
+    setLipTintViewOpen(false);
+    setShadeViewOpen(false);
+    setSelectedProduct(null);
+  };
+
   const handleOpenProduct = (product) => {
     if (!product) return;
+    closeAllProductViews();
+
     const isGlazingMilk =
       product.isGlazingMilk ||
       product.id === 'glazing-milk' ||
@@ -277,8 +318,7 @@ export default function App() {
           {/* Editorial Split-Screen Brand Philosophy Section */}
           <PhilosophySection />
 
-          {/* French Alpine Actives & Cellular Science Section */}
-          <ScienceSection />
+
 
           {/* Interactive Our Values Tabbed Showcase Section */}
           <ValuesSection />
@@ -385,6 +425,7 @@ export default function App() {
           setSearchOpen(false);
         }}
         onAddToCart={handleAddToCart}
+        onNavigate={handleNavigate}
       />
 
       {/* Full-Screen Standalone Account Page */}
@@ -398,6 +439,10 @@ export default function App() {
         onOpenSearch={() => {
           setAccountOpen(false);
           setSearchOpen(true);
+        }}
+        onOpenAdmin={() => {
+          setAccountOpen(false);
+          setAdminOpen(true);
         }}
         cartCount={totalCartCount}
       />
@@ -450,6 +495,19 @@ export default function App() {
           }
         }}
       />
+
+      {/* Official Legal & Information Pages (Privacy, Terms, Accessibility, FAQ, Contact) */}
+      {legalPage && (
+        <LegalPage
+          pageType={legalPage}
+          onClose={() => {
+            setLegalPage(null);
+            if (['#privacy', '#terms', '#accessibility', '#faq', '#contact'].includes(window.location.hash.toLowerCase())) {
+              window.history.replaceState(null, '', window.location.pathname);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

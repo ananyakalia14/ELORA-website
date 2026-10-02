@@ -142,13 +142,10 @@ export default function Footer({ onNavigate, variant }) {
             </h4>
             <ul className="elora-col-list space-y-3">
               {[
-                { label: 'Shop', href: '#shop' },
-                { label: 'Our Story', href: '#story' },
-                { label: 'French Alpine Actives', href: '#science' },
-                { label: 'Cellular Science', href: '#science' },
+                { label: 'Shop The Collection', href: '#shop' },
+                { label: 'Our Story & Philosophy', href: '#story' },
                 { label: 'The Journal', href: '#journal' },
                 { label: 'Store Locator', href: '#stores' },
-                { label: 'Atelier Admin', href: '#admin' },
               ].map((link, idx) => (
                 <li key={idx}>
                   <a

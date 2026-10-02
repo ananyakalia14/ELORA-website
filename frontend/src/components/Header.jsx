@@ -47,6 +47,18 @@ export default function Header({
     }
   };
 
+  // Lock scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   return (
     <>
       <header
@@ -60,7 +72,7 @@ export default function Header({
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
           <nav className="header-nav-left desktop-only" aria-label="Primary Navigation">
@@ -135,7 +147,7 @@ export default function Header({
             onClick={onOpenSearch}
             aria-label="Search products"
           >
-            <Search size={18} />
+            <Search size={19} />
           </button>
 
           {/* Account Action Desktop */}
@@ -153,7 +165,7 @@ export default function Header({
             onClick={onOpenAccount}
             aria-label="User Account"
           >
-            <User size={18} />
+            <User size={19} />
           </button>
 
           {/* Bag with Count Badge */}
@@ -171,6 +183,7 @@ export default function Header({
       {/* Luxury Full-Screen Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="elora-mobile-nav-drawer" role="dialog" aria-modal="true">
+          <div className="elora-mobile-nav-overlay-backdrop" onClick={() => setMobileMenuOpen(false)} />
           <div className="elora-mobile-nav-inner">
             <div className="elora-mobile-nav-header">
               <span className="elora-mobile-nav-tag">ÉLORA DIRECTORY</span>
@@ -186,12 +199,11 @@ export default function Header({
             <nav className="elora-mobile-nav-links">
               {[
                 { label: 'Shop The Collection', href: '#shop', desc: 'Five essentials, one signature glow' },
-                { label: 'Our Story & Philosophy', href: '#story', desc: 'French botanical tradition & cellular science' },
-                { label: 'French Alpine Actives', href: '#science', desc: 'Sub-zero cryo-distilled Alpine Rose stem cells' },
-                { label: 'Cellular Science', href: '#science', desc: '5-tier oligo molecular delivery' },
+                { label: 'Our Story & Philosophy', href: '#story', desc: 'French botanical tradition & active rituals' },
                 { label: 'The Journal', href: '#journal', desc: 'Inaugural Volume I • Essays & ritual guides' },
                 { label: 'Store Locator', href: '#stores', desc: 'Paris, New York, Tokyo flagships' },
-                { label: 'Atelier Admin', href: '#admin', desc: 'Boutique inventory & order fulfillment' },
+                { label: 'FAQ & Client Care', href: '#faq', desc: 'Rituals, shipping & concierge assistance' },
+                { label: 'Contact Atelier', href: '#contact', desc: 'Annecy, Haute-Savoie, France' },
               ].map((link, idx) => (
                 <a
                   key={idx}

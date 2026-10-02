@@ -8,7 +8,9 @@ import {
   CheckCircle2,
   Sparkles,
   ChevronRight,
-  Gift
+  Gift,
+  ShoppingBag,
+  ChevronDown
 } from 'lucide-react';
 import GlitterConfetti from './GlitterConfetti';
 
@@ -20,6 +22,7 @@ export default function CheckoutPage({
   onOpenStore,
 }) {
   const [confettiActive, setConfettiActive] = useState(false);
+  const [mobileSummaryOpen, setMobileSummaryOpen] = useState(true);
   // Form State with lazy localStorage initialization
   const [formData, setFormData] = useState(() => {
     let email = '';
@@ -355,18 +358,6 @@ export default function CheckoutPage({
               >
                 Continue Shopping
               </button>
-
-              <button
-                className="btn-pill-secondary confirmed-replay-btn"
-                onClick={() => {
-                  // Re-trigger celebratory burst
-                  setConfettiActive(false);
-                  setTimeout(() => setConfettiActive(true), 50);
-                }}
-              >
-                <Sparkles size={15} color="#D4AF37" />
-                <span>Shower More Glitters & Confetti ✨</span>
-              </button>
             </div>
           </div>
         </div>
@@ -386,7 +377,7 @@ export default function CheckoutPage({
                 aria-label="Return to shopping bag"
               >
                 <ArrowLeft size={16} />
-                <span>Return to Bag</span>
+                <span className="checkout-back-text">Return to Bag</span>
               </button>
 
               <div className="checkout-logo-wrap">
@@ -396,7 +387,7 @@ export default function CheckoutPage({
 
               <div className="checkout-security-badge">
                 <Lock size={13} color="#27672B" />
-                <span>256-Bit Encrypted</span>
+                <span className="security-badge-text">256-Bit Encrypted</span>
               </div>
             </div>
           </header>
@@ -866,7 +857,25 @@ export default function CheckoutPage({
 
               {/* Right Column: Order Summary */}
               <div className="checkout-summary-column">
-                <div className="checkout-summary-sticky">
+                {/* Mobile Collapsible Summary Toggle Banner */}
+                <button
+                  type="button"
+                  className="mobile-summary-toggle-bar"
+                  onClick={() => setMobileSummaryOpen(!mobileSummaryOpen)}
+                  aria-expanded={mobileSummaryOpen}
+                >
+                  <div className="mobile-summary-toggle-left">
+                    <ShoppingBag size={15} color="#AC7E76" />
+                    <span>{mobileSummaryOpen ? 'Hide order summary' : 'Show order summary'}</span>
+                    <ChevronDown
+                      size={14}
+                      className={`mobile-summary-arrow ${mobileSummaryOpen ? 'is-open' : ''}`}
+                    />
+                  </div>
+                  <span className="mobile-summary-toggle-total">${grandTotal.toFixed(2)}</span>
+                </button>
+
+                <div className={`checkout-summary-sticky ${mobileSummaryOpen ? 'is-mobile-open' : 'is-mobile-closed'}`}>
                   <div className="summary-card">
                     <h3 className="summary-title">Your Atelier Selection</h3>
 
