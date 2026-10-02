@@ -1,7 +1,7 @@
 fastapi[standard]==0.115.0
 uvicorn[standard]==0.30.0
 sqlalchemy[asyncio]==2.0.32
-asyncpg==0.29.0
+asyncpg==0.30.0
 pydantic-settings==2.4.0
 redis[hiredis]==5.0.8
 elasticsearch[async]==8.15.0
