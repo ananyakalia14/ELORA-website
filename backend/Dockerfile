@@ -23,7 +23,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/app/ ./app/
 COPY backend/scripts/ ./scripts/
 COPY backend/data/ ./data/
-COPY backend/migrations/ ./migrations/
 
 # Copy built frontend static dist and public files
 COPY --from=frontend-builder /build/dist ./frontend/dist
