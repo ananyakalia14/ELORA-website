@@ -1,16 +1,74 @@
-# React + Vite
+# Élora — Luxury Boutique E-Commerce Monorepo
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Enterprise cosmetic e-commerce platform combining a boutique editorial React frontend with an asynchronous FastAPI backend, PostgreSQL, Redis, Elasticsearch, and real-time streaming analytics.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📁 Repository Structure
 
-## React Compiler
+```
+├── frontend/             # Élora Client (React 19 + Vite 8 + Three.js)
+│   ├── src/              # Components, styles, 3D canvases, and app logic
+│   ├── public/           # Static assets, media, editorial images
+│   ├── package.json      # Frontend dependencies & scripts
+│   └── vite.config.js    # Vite configuration
+│
+├── backend/              # OmniMart API (FastAPI + Async SQLAlchemy)
+│   ├── app/              # FastAPI application (routers, models, services)
+│   ├── connectors/       # Debezium CDC Postgres connector configs
+│   ├── data/             # Product catalogs & seed data
+│   ├── docs/             # Architecture & Microsoft Fabric guides
+│   ├── fabric/           # Fabric KQL queries, Lakehouse notebooks, & ALS ML
+│   ├── migrations/       # SQL database migrations
+│   ├── scripts/          # Product seeding, indexing & embedding sync scripts
+│   ├── docker-compose.yml# Local infrastructure (Postgres, Redis, ES, Redpanda)
+│   └── requirements.txt  # Python backend dependencies
+│
+└── README.md             # Project documentation
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the Oxlint configuration
+## 🚀 Quick Start
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+### 1. Backend Setup
+
+```bash
+cd backend
+
+# (Optional) Start local Docker infrastructure (Redis, Elasticsearch, etc.)
+docker-compose up -d
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Start the API server
+uvicorn app.main:app --reload --port 8000
+```
+
+* API Docs (Swagger UI): **http://127.0.0.1:8000/docs**
+* Health Check: **http://127.0.0.1:8000/health**
+
+### 2. Frontend Setup
+
+```bash
+cd frontend
+
+# Install Node dependencies
+npm install
+
+# Start the Vite development server
+npm run dev
+```
+
+* Web App: **http://localhost:5173/**
+
+---
+
+## 🛠️ Tech Stack
+
+* **Frontend**: React 19, Vite 8, Three.js (3D product shaders/anatomy), Lucide Icons
+* **Backend**: FastAPI, Async SQLAlchemy, Asyncpg, Pydantic v2
+* **Database & Cache**: PostgreSQL (Supabase / local), Redis 7
+* **Search Engine**: Elasticsearch 8 (full-text search, fuzzy prefix autocomplete)
+* **Real-Time & Analytics**: Debezium CDC, Redpanda (Kafka), Microsoft Fabric Lakehouse (KQL + Spark)

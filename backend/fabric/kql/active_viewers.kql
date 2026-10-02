@@ -1,0 +1,29 @@
+// Active viewers on a specific product in the last 5 minutes
+// Usage: Replace {PRODUCT_ID} with actual product ID or parameterize in KQL queryset
+
+// --- Query 1: Active viewers count for a product ---
+ClickstreamEvents
+| where EventType == "page_view"
+| where ProductId == {PRODUCT_ID}
+| where Timestamp > ago(5m)
+| summarize ActiveViewers = dcount(UserId)
+
+// --- Query 2: Active viewers per product (top 20 trending) ---
+ClickstreamEvents
+| where EventType == "page_view"
+| where Timestamp > ago(5m)
+| summarize ActiveViewers = dcount(UserId) by ProductId
+| top 20 by ActiveViewers desc
+
+// --- Query 3: Real-time activity heatmap (events per minute, last 30 min) ---
+ClickstreamEvents
+| where Timestamp > ago(30m)
+| summarize EventCount = count() by bin(Timestamp, 1m), EventType
+| order by Timestamp asc
+
+// --- Query 4: Live cart additions (last 10 minutes) ---
+ClickstreamEvents
+| where EventType == "add_to_cart"
+| where Timestamp > ago(10m)
+| summarize CartAdds = count(), UniqueUsers = dcount(UserId) by ProductId
+| top 10 by CartAdds desc
