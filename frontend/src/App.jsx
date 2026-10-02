@@ -19,6 +19,7 @@ import CartDrawer from './components/CartDrawer';
 import SearchDrawer from './components/SearchDrawer';
 import AccountPage from './components/AccountPage';
 import CheckoutPage from './components/CheckoutPage';
+import OrderTrackingModal from './components/OrderTrackingModal';
 import MobileStickyCta from './components/MobileStickyCta';
 import EditorialComingSoon from './components/EditorialComingSoon';
 import AdminDashboard from './components/AdminDashboard';
@@ -38,6 +39,10 @@ export default function App() {
 
   // Account modal state
   const [accountOpen, setAccountOpen] = useState(false);
+
+  // Order tracking modal state
+  const [trackingOpen, setTrackingOpen] = useState(false);
+  const [trackingOrder, setTrackingOrder] = useState(null);
 
   // Checkout page state
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -103,6 +108,11 @@ export default function App() {
     if (cleanHash === 'stores' || cleanHash === 'store' || cleanHash === 'store-locator') {
       setComingSoon({ isOpen: true, type: 'stores' });
       window.history.replaceState(null, '', '#stores');
+      return;
+    }
+    if (['track', 'track-order', 'tracking', 'order-status'].includes(cleanHash)) {
+      setTrackingOpen(true);
+      window.history.replaceState(null, '', '#track-order');
       return;
     }
     if (cleanHash === 'admin') {
@@ -444,6 +454,10 @@ export default function App() {
           setAccountOpen(false);
           setAdminOpen(true);
         }}
+        onTrackOrder={(order) => {
+          setTrackingOrder(order);
+          setTrackingOpen(true);
+        }}
         cartCount={totalCartCount}
       />
 
@@ -469,6 +483,27 @@ export default function App() {
         onClearCart={() => setCartItems([])}
         onOpenStore={() => {
           setCheckoutOpen(false);
+        }}
+        onTrackOrder={(order) => {
+          setTrackingOrder(order);
+          setTrackingOpen(true);
+        }}
+      />
+
+      {/* Real-Time Order & Delivery Tracking Portal */}
+      <OrderTrackingModal
+        isOpen={trackingOpen}
+        onClose={() => {
+          setTrackingOpen(false);
+          setTrackingOrder(null);
+          if (['#track', '#track-order', '#tracking'].includes(window.location.hash.toLowerCase())) {
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        }}
+        initialOrder={trackingOrder}
+        onOpenStore={() => {
+          setTrackingOpen(false);
+          handleNavigate('#shop');
         }}
       />
 

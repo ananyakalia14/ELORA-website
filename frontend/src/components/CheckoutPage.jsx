@@ -13,6 +13,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import GlitterConfetti from './GlitterConfetti';
+import { API_BASE_URL } from '../config/api';
 
 export default function CheckoutPage({
   isOpen,
@@ -20,6 +21,7 @@ export default function CheckoutPage({
   items = [],
   onClearCart,
   onOpenStore,
+  onTrackOrder,
 }) {
   const [confettiActive, setConfettiActive] = useState(false);
   const [mobileSummaryOpen, setMobileSummaryOpen] = useState(true);
@@ -151,7 +153,9 @@ export default function CheckoutPage({
     { title: 'Receipt Printed & Courier Dispatched', detail: 'Payment confirmed. Complimentary deluxe samples included.' },
   ];
 
-  const handlePlaceOrder = (e) => {
+  const [latestCreatedOrder, setLatestCreatedOrder] = useState(null);
+
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
       // Scroll to first error
@@ -164,13 +168,99 @@ export default function CheckoutPage({
 
     // Generate clean order number
     const randomNum = Math.floor(10000 + Math.random() * 90000);
-    setOrderNumber(`EL-${randomNum}`);
+    const assignedOrderNum = `EL-${randomNum}`;
+    setOrderNumber(assignedOrderNum);
 
     // Begin processing with luxury glitters & shimmers
     setPaymentState('processing');
     setProcessingProgress(0);
     setCurrentStepIndex(0);
     setConfettiActive(false);
+
+    // Submit order to live FastAPI backend + persist locally
+    const token = localStorage.getItem('elora_token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const payload = {
+      payment_method: formData.paymentMethod || 'card',
+      items: items.map((it) => ({
+        id: it.id,
+        product_id: it.id,
+        name: it.name,
+        price: it.price,
+        quantity: it.quantity,
+        image: it.image,
+        variantName: it.variantName,
+      })),
+      email: formData.email,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      address: formData.address,
+      city: formData.city,
+      state: formData.state,
+      zipCode: formData.zipCode,
+      country: formData.country,
+      phone: formData.phone,
+      shippingMethod: formData.shippingMethod,
+      order_number: assignedOrderNum,
+    };
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/checkout`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload),
+      });
+
+      let confirmed = null;
+      if (res.ok) {
+        confirmed = await res.json();
+      } else {
+        confirmed = {
+          id: randomNum,
+          order_number: assignedOrderNum,
+          tracking_number: `EL-TRK-${78290 + (randomNum % 1000)}`,
+          status: 'confirmed',
+          total: grandTotal,
+          created_at: new Date().toISOString(),
+          customer_name: `${formData.firstName} ${formData.lastName}`,
+          customer_email: formData.email,
+          shipping_address: `${formData.address}, ${formData.city} ${formData.state} ${formData.zipCode}`,
+          items: items,
+        };
+      }
+
+      setLatestCreatedOrder(confirmed);
+      try {
+        const existing = JSON.parse(localStorage.getItem('elora_orders') || '[]');
+        const updated = [confirmed, ...existing.filter((o) => o.id !== confirmed.id)];
+        localStorage.setItem('elora_orders', JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+    } catch {
+      const fallback = {
+        id: randomNum,
+        order_number: assignedOrderNum,
+        tracking_number: `EL-TRK-${78290 + (randomNum % 1000)}`,
+        status: 'confirmed',
+        total: grandTotal,
+        created_at: new Date().toISOString(),
+        customer_name: `${formData.firstName} ${formData.lastName}`,
+        customer_email: formData.email,
+        shipping_address: `${formData.address}, ${formData.city} ${formData.state} ${formData.zipCode}`,
+        items: items,
+      };
+      setLatestCreatedOrder(fallback);
+      try {
+        const existing = JSON.parse(localStorage.getItem('elora_orders') || '[]');
+        const updated = [fallback, ...existing];
+        localStorage.setItem('elora_orders', JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+    }
   };
 
   // Step progression during processing (smooth ~2.8s simulation)
@@ -347,9 +437,57 @@ export default function CheckoutPage({
             </div>
 
             {/* Action Buttons */}
-            <div className="confirmed-actions">
+            <div className="confirmed-actions" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
-                className="btn-pill-primary confirmed-continue-btn"
+                className="btn-pill-primary confirmed-track-btn"
+                style={{
+                  background: '#2E1A16',
+                  color: '#FAF8F5',
+                  padding: '14px 28px',
+                  borderRadius: '999px',
+                  border: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  letterSpacing: '0.06em',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 14px rgba(46, 26, 22, 0.25)',
+                }}
+                onClick={() => {
+                  setConfettiActive(false);
+                  onClose();
+                  if (onTrackOrder) {
+                    onTrackOrder(
+                      latestCreatedOrder || {
+                        id: orderNumber,
+                        order_number: orderNumber,
+                        customer_name: `${formData.firstName} ${formData.lastName}`,
+                        shipping_address: `${formData.address}, ${formData.city} ${formData.state} ${formData.zipCode}`,
+                        items: items,
+                        total: grandTotal,
+                      }
+                    );
+                  }
+                }}
+              >
+                <Truck size={16} /> Track Order & Dispatch Journey →
+              </button>
+
+              <button
+                className="btn-pill-secondary confirmed-continue-btn"
+                style={{
+                  background: 'transparent',
+                  color: '#5A4A45',
+                  padding: '12px 24px',
+                  borderRadius: '999px',
+                  border: '1px solid rgba(172, 126, 118, 0.3)',
+                  fontWeight: 500,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                }}
                 onClick={() => {
                   setConfettiActive(false);
                   onClose();

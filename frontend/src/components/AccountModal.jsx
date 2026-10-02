@@ -1,21 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, Eye, EyeOff, User, X, Check, ArrowRight, Sparkles, Package, LogOut } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, User, X, Check, ArrowRight, Sparkles, Package, LogOut, Truck } from 'lucide-react';
 import { API_BASE_URL } from '../config/api';
 
-/**
- * AccountModal Component for Élora Skin & Beauty
- * Replicates the exact visual design and typography of the Élora Account Portal mockup:
- * - Left side: Intravenous IV infusion drip pouch with Élora skincare products dripping rose elixir.
- * - Background: Warm sandy plaster wall with soft botanical palm shadows.
- * - Right side:
- *   - "ÉLORA SKIN & BEAUTY" serif typography
- *   - Frosted pill inputs for Email (with Mail icon) and Password (with Lock icon & show/hide toggle)
- *   - Dusty rose terracotta pill "SIGN IN" button with active states
- *   - "Forgot your password?" recovery flow
- *   - "Don't have an account? Sign up!" registration flow
- *   - Interactive Signed-In VIP Member Dashboard with rewards & order history
- */
-export default function AccountModal({ isOpen, onClose, onOpenCart }) {
+export default function AccountModal({ isOpen, onClose, onOpenCart, onTrackOrder }) {
   // View states: 'signin' | 'signup' | 'forgot' | 'dashboard'
   const [view, setView] = useState('signin');
 
@@ -28,8 +15,9 @@ export default function AccountModal({ isOpen, onClose, onOpenCart }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [forgotSent, setForgotSent] = useState(false);
 
-  // User session state
+  // User session state & orders
   const [currentUser, setCurrentUser] = useState(null);
+  const [orders, setOrders] = useState([]);
 
   // Close on ESC key & prevent body scrolling
   useEffect(() => {
@@ -106,6 +94,34 @@ export default function AccountModal({ isOpen, onClose, onOpenCart }) {
           : '2026',
         token: token,
       };
+
+      const loadOrders = async (authToken) => {
+        let localOrders = [];
+        try {
+          localOrders = JSON.parse(localStorage.getItem('elora_orders') || '[]');
+        } catch {}
+
+        try {
+          const ordersRes = await fetch(`${API_BASE_URL}/orders`, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+          if (ordersRes.ok) {
+            const dbOrders = await ordersRes.json();
+            const combined = [...dbOrders];
+            const dbIds = new Set(dbOrders.map((o) => o.id));
+            for (const loc of localOrders) {
+              if (!dbIds.has(loc.id)) combined.push(loc);
+            }
+            setOrders(combined);
+          } else {
+            setOrders(localOrders);
+          }
+        } catch {
+          setOrders(localOrders);
+        }
+      };
+
+      loadOrders(token);
 
       localStorage.setItem('elora_token', token);
       localStorage.setItem('elora_user', JSON.stringify(verifiedUser));
@@ -552,13 +568,92 @@ export default function AccountModal({ isOpen, onClose, onOpenCart }) {
 
               {/* Order Status */}
               <div className="elora-account-order-preview">
-                <div className="elora-account-order-title-row">
-                  <Package size={15} color="#5A4A45" />
-                  <span>Order History</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Package size={15} color="#AC7E76" />
+                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#3A2E2B' }}>
+                      Order History ({orders.length})
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#AC7E76',
+                      fontSize: '0.72rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                    onClick={() => {
+                      onClose();
+                      onTrackOrder?.(orders[0] || null);
+                    }}
+                  >
+                    <Truck size={12} /> Track Order →
+                  </button>
                 </div>
-                <p className="elora-account-order-desc">
-                  No previous orders placed. Your completed orders will appear here.
-                </p>
+
+                {orders && orders.length > 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto' }}>
+                    {orders.map((order, idx) => {
+                      const orderNum = order.order_number || `EL-${order.id}`;
+                      const trackNum = order.tracking_number || `EL-TRK-${78290 + (order.id || idx)}`;
+                      return (
+                        <div
+                          key={order.id || idx}
+                          style={{
+                            background: '#FAF8F5',
+                            padding: '10px 12px',
+                            borderRadius: '10px',
+                            border: '1px solid rgba(172, 126, 118, 0.15)',
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem', fontWeight: 600, color: '#2E1A16' }}>
+                            <span>Order #{orderNum}</span>
+                            <span style={{ color: '#AC7E76', textTransform: 'uppercase', fontSize: '0.68rem' }}>
+                              {order.status || 'Confirmed'}
+                            </span>
+                          </div>
+                          <p style={{ margin: '4px 0', fontSize: '0.72rem', color: '#5A4A45' }}>
+                            {order.items?.map((it) => `${it.name}${it.quantity > 1 ? ` (x${it.quantity})` : ''}`).join(', ') || 'The Élora Botanical Ritual'}
+                          </p>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.7rem', color: '#776863' }}>
+                              Total: ${(order.total || 0).toFixed(2)}
+                            </span>
+                            <button
+                              type="button"
+                              style={{
+                                background: '#2E1A16',
+                                color: '#FAF8F5',
+                                border: 'none',
+                                borderRadius: '999px',
+                                padding: '3px 8px',
+                                fontSize: '0.68rem',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                              }}
+                              onClick={() => {
+                                onClose();
+                                onTrackOrder?.(order);
+                              }}
+                            >
+                              Track →
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="elora-account-order-desc">
+                    No previous orders placed. Your completed orders will appear here.
+                  </p>
+                )}
               </div>
 
               {/* Action Buttons */}

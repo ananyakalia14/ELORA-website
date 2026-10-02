@@ -10217,3 +10217,486 @@ button.elora-expandable-shade-btn:hover {
   box-shadow: 0 6px 20px rgba(58, 46, 43, 0.2);
 }
 
+/* =========================================================================
+   ÉLORA ATELIER ORDER TRACKING PORTAL MODAL
+   ========================================================================= */
+.elora-tracker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.elora-tracker-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(31, 18, 15, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.elora-tracker-modal {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #FFFDF9;
+  border: 1px solid rgba(172, 126, 118, 0.25);
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(46, 26, 22, 0.35);
+  padding: 2rem;
+  z-index: 10;
+  animation: modalScaleUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.elora-tracker-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.elora-tracker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(212, 175, 55, 0.12);
+  color: #8C6D1F;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.elora-tracker-heading {
+  font-family: var(--font-serif-display, 'Italiana', 'Cormorant Garamond', Georgia, serif);
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #2E1A16;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.elora-tracker-close-btn {
+  background: transparent;
+  border: none;
+  color: #7D5348;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.elora-tracker-close-btn:hover {
+  background: rgba(172, 126, 118, 0.1);
+  color: #2E1A16;
+  transform: rotate(90deg);
+}
+
+.elora-tracker-search-bar {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border: 1.5px solid rgba(172, 126, 118, 0.3);
+  border-radius: 999px;
+  padding: 6px 8px 6px 16px;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 10px rgba(58, 46, 43, 0.04);
+}
+
+.elora-tracker-search-icon {
+  color: #AC7E76;
+  flex-shrink: 0;
+}
+
+.elora-tracker-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.85rem;
+  color: #2E1A16;
+  font-family: var(--font-sans);
+}
+
+.elora-tracker-search-input::placeholder {
+  color: #A89B95;
+}
+
+.elora-tracker-search-btn {
+  background: #2E1A16;
+  color: #FAF8F5;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.elora-tracker-search-btn:hover:not(:disabled) {
+  background: #4A2E28;
+}
+
+.elora-tracker-error-alert {
+  background: #FEECEB;
+  color: #C62828;
+  border: 1px solid rgba(198, 40, 40, 0.2);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.elora-tracker-status-banner {
+  background: linear-gradient(135deg, #FAF4EF 0%, #F5EAE1 100%);
+  border: 1px solid rgba(172, 126, 118, 0.25);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.elora-tracker-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #8C6D1F;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.elora-tracker-status-title {
+  font-family: var(--font-serif-display, Georgia, serif);
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: #2E1A16;
+  margin: 0 0 4px 0;
+}
+
+.elora-tracker-status-desc {
+  font-size: 0.78rem;
+  color: #5A4A45;
+  margin: 0;
+}
+
+.elora-tracker-status-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.elora-tracker-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #2E1A16;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(172, 126, 118, 0.2);
+}
+
+.elora-tracker-copy-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-family: monospace;
+  color: #7D5348;
+  background: #FFFFFF;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px dashed rgba(172, 126, 118, 0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.elora-tracker-copy-pill:hover {
+  background: #F8F3ED;
+  color: #2E1A16;
+}
+
+.elora-tracker-timeline-box {
+  background: #FFFFFF;
+  border: 1px solid rgba(172, 126, 118, 0.18);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.elora-tracker-section-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2E1A16;
+  margin: 0 0 1.25rem 0;
+}
+
+.elora-tracker-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.elora-tracker-step {
+  display: flex;
+  gap: 14px;
+  position: relative;
+}
+
+.elora-tracker-step-icon-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.elora-tracker-step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #F0EAE4;
+  color: #FAF8F5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.elora-tracker-step.is-completed .elora-tracker-step-dot {
+  background: #27672B;
+}
+
+.elora-tracker-step.is-current .elora-tracker-step-dot {
+  background: #D4AF37;
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.25);
+  animation: pulseGold 2s infinite ease-in-out;
+}
+
+@keyframes pulseGold {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(212, 175, 55, 0.05);
+  }
+}
+
+.elora-tracker-dot-inner {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #A89B95;
+}
+
+.elora-tracker-step-line {
+  width: 2px;
+  flex: 1;
+  min-height: 38px;
+  background: #E8DDD7;
+  margin: 3px 0;
+}
+
+.elora-tracker-step.is-completed .elora-tracker-step-line {
+  background: #27672B;
+}
+
+.elora-tracker-step-content {
+  flex: 1;
+  padding-bottom: 1.25rem;
+}
+
+.elora-tracker-step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2px;
+}
+
+.elora-tracker-step-title {
+  font-size: 0.84rem;
+  color: #2E1A16;
+  font-weight: 600;
+}
+
+.elora-tracker-step-time {
+  font-size: 0.72rem;
+  color: #7D5348;
+}
+
+.elora-tracker-step-detail {
+  font-size: 0.75rem;
+  color: #6E5F5A;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.elora-tracker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .elora-tracker-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.elora-tracker-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(172, 126, 118, 0.18);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.elora-tracker-card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #2E1A16;
+  margin-bottom: 0.75rem;
+}
+
+.elora-tracker-card-text {
+  font-size: 0.78rem;
+  color: #5A4A45;
+  line-height: 1.5;
+  margin: 0 0 0.75rem 0;
+}
+
+.elora-tracker-card-security {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.68rem;
+  color: #27672B;
+  background: #F1F8F1;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.elora-tracker-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 140px;
+  overflow-y: auto;
+  margin-bottom: 0.75rem;
+}
+
+.elora-tracker-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+}
+
+.elora-tracker-item-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid rgba(172, 126, 118, 0.2);
+}
+
+.elora-tracker-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.elora-tracker-item-name {
+  font-weight: 600;
+  color: #2E1A16;
+}
+
+.elora-tracker-item-meta {
+  font-size: 0.68rem;
+  color: #7D5348;
+}
+
+.elora-tracker-item-price {
+  font-weight: 600;
+  color: #2E1A16;
+}
+
+.elora-tracker-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed rgba(172, 126, 118, 0.2);
+  padding-top: 8px;
+  font-size: 0.8rem;
+  color: #2E1A16;
+}
+
+.elora-tracker-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.elora-tracker-btn-primary {
+  background: #2E1A16;
+  color: #FAF8F5;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 28px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(46, 26, 22, 0.2);
+}
+
+.elora-tracker-btn-primary:hover {
+  background: #4A2E28;
+  transform: translateY(-1px);
+}
+
+

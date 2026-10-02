@@ -143,6 +143,7 @@ export default function Footer({ onNavigate, variant }) {
             <ul className="elora-col-list space-y-3">
               {[
                 { label: 'Shop The Collection', href: '#shop' },
+                { label: 'Track Your Order', href: '#track-order' },
                 { label: 'Our Story & Philosophy', href: '#story' },
                 { label: 'The Journal', href: '#journal' },
                 { label: 'Store Locator', href: '#stores' },

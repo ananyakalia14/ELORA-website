@@ -88,27 +88,84 @@ class CartOut(BaseModel):
 
 # ── Orders ────────────────────────────────────────────────────────────────
 
+class CheckoutItem(BaseModel):
+    id: str | int | None = None
+    product_id: str | int | None = None
+    name: str | None = None
+    price: float | None = None
+    quantity: int = 1
+    image: str | None = None
+    variantName: str | None = None
+
+
+class CheckoutRequest(BaseModel):
+    payment_method: str = "card"  # card, klarna, cod
+    items: list[CheckoutItem] = []
+    email: str | None = None
+    firstName: str | None = None
+    lastName: str | None = None
+    address: str | None = None
+    city: str | None = None
+    state: str | None = None
+    zipCode: str | None = None
+    country: str | None = None
+    phone: str | None = None
+    shippingMethod: str | None = "standard"
+    order_number: str | None = None
+
+
 class OrderItemOut(BaseModel):
-    product_id: int
+    id: int | None = None
+    product_id: int | None = None
+    name: str | None = None
     quantity: int
     price: float
+    image: str | None = None
+    variantName: str | None = None
+    shade: str | None = None
 
     model_config = {"from_attributes": True}
+
+
+class TrackingMilestone(BaseModel):
+    title: str
+    detail: str
+    timestamp: str
+    completed: bool
+    current: bool
+
+
+class OrderTrackingInfo(BaseModel):
+    order_id: int | str
+    order_number: str
+    tracking_number: str
+    carrier: str
+    status: str
+    created_at: datetime
+    estimated_delivery: str
+    shipping_address: str | None = None
+    customer_name: str | None = None
+    customer_email: str | None = None
+    total: float
+    items: list[OrderItemOut] = []
+    milestones: list[TrackingMilestone] = []
 
 
 class OrderOut(BaseModel):
     id: int
+    order_number: str | None = None
+    tracking_number: str | None = None
+    carrier: str | None = "Élora White-Glove Atelier Courier"
+    estimated_delivery: str | None = None
     user_id: int
     status: str
     total: float
     created_at: datetime
+    shipping_address: str | None = None
+    customer_name: str | None = None
     items: list[OrderItemOut] = []
 
     model_config = {"from_attributes": True}
-
-
-class CheckoutRequest(BaseModel):
-    payment_method: str = "card"  # card, upi, cod
 
 
 # ── Clickstream ───────────────────────────────────────────────────────────

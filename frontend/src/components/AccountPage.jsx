@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, Eye, EyeOff, Check, Package, LogOut, ShoppingBag, ShieldCheck, Sliders } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Check, Package, LogOut, ShoppingBag, ShieldCheck, Sliders, Truck, ArrowRight } from 'lucide-react';
 import Header from './Header';
 import Footer from './Footer';
 import { API_BASE_URL } from '../config/api';
@@ -10,6 +10,7 @@ export default function AccountPage({
   onOpenCart,
   onOpenSearch,
   onOpenAdmin,
+  onTrackOrder,
   cartCount = 0,
 }) {
   // Input states
@@ -27,6 +28,19 @@ export default function AccountPage({
   const [orders, setOrders] = useState([]);
   const [view, setView] = useState('signin');
 
+  const loadLocalOrders = () => {
+    try {
+      const stored = localStorage.getItem('elora_orders');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+    return [];
+  };
+
   // Verify real session with PostgreSQL database on open
   useEffect(() => {
     if (isOpen) {
@@ -34,6 +48,9 @@ export default function AccountPage({
       if (window.location.hash !== '#account') {
         window.history.pushState(null, '', '#account');
       }
+
+      const localOrders = loadLocalOrders();
+      setOrders(localOrders);
 
       // Check real JWT token against PostgreSQL database
       const token = localStorage.getItem('elora_token');
@@ -62,8 +79,18 @@ export default function AccountPage({
                 headers: { Authorization: `Bearer ${token}` },
               })
                 .then((r) => (r.ok ? r.json() : []))
-                .then((dbOrders) => setOrders(dbOrders))
-                .catch(() => setOrders([]));
+                .then((dbOrders) => {
+                  const combined = [...dbOrders];
+                  // merge local orders not already in db
+                  const dbIds = new Set(dbOrders.map((o) => o.id));
+                  for (const loc of localOrders) {
+                    if (!dbIds.has(loc.id)) {
+                      combined.push(loc);
+                    }
+                  }
+                  setOrders(combined);
+                })
+                .catch(() => setOrders(localOrders));
             } else {
               // Token invalid or expired, clear storage and show signin
               localStorage.removeItem('elora_token');
@@ -736,29 +763,93 @@ export default function AccountPage({
 
                 {/* Order Summary & History */}
                 <div className="elora-account-dash-card">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: orders.length > 0 ? '6px' : '2px' }}>
-                    <Package size={15} color="#AC7E76" />
-                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#3A2E2B', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                      Recent Orders
-                    </span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: orders.length > 0 ? '8px' : '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Package size={15} color="#AC7E76" />
+                      <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#3A2E2B', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                        Recent Orders ({orders.length})
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#AC7E76',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                      }}
+                      onClick={() => onTrackOrder?.(orders[0] || null)}
+                    >
+                      <Truck size={13} /> Order Tracker →
+                    </button>
                   </div>
 
                   {orders && orders.length > 0 ? (
                     <div className="elora-account-order-list">
-                      {orders.map((order, idx) => (
-                        <div key={order.id || idx} className="elora-account-order-item">
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 600, color: '#2E1A16' }}>
-                            <span>Order #{order.id}</span>
-                            <span style={{ color: '#AC7E76' }}>{order.status || 'Confirmed'}</span>
+                      {orders.map((order, idx) => {
+                        const orderNum = order.order_number || `EL-${order.id}`;
+                        const trackNum = order.tracking_number || `EL-TRK-${78290 + (order.id || idx)}`;
+                        const isDelivered = (order.status || '').toLowerCase() === 'delivered';
+                        const isShipped = (order.status || '').toLowerCase() === 'shipped';
+
+                        return (
+                          <div key={order.id || idx} className="elora-account-order-item" style={{ padding: '12px', background: '#FAF8F5', borderRadius: '12px', marginBottom: '8px', border: '1px solid rgba(172, 126, 118, 0.15)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', fontWeight: 600, color: '#2E1A16' }}>
+                              <span>Order #{orderNum}</span>
+                              <span
+                                style={{
+                                  background: isDelivered ? '#E8F5E9' : isShipped ? '#E3F2FD' : '#FBE9E7',
+                                  color: isDelivered ? '#2E7D32' : isShipped ? '#1565C0' : '#D84315',
+                                  padding: '2px 8px',
+                                  borderRadius: '999px',
+                                  fontSize: '0.7rem',
+                                  fontWeight: 600,
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.04em',
+                                }}
+                              >
+                                {order.status || 'Confirmed'}
+                              </span>
+                            </div>
+
+                            <p className="elora-account-order-desc" style={{ margin: '6px 0', fontSize: '0.75rem', color: '#5A4A45' }}>
+                              {order.items?.map((it) => `${it.name}${it.quantity > 1 ? ` (x${it.quantity})` : ''}`).join(', ') || 'The Élora Botanical Ritual'}
+                            </p>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                              <span style={{ fontSize: '0.72rem', color: '#776863' }}>
+                                Total: <strong>${(order.total || 0).toFixed(2)}</strong> • {trackNum}
+                              </span>
+
+                              <button
+                                type="button"
+                                style={{
+                                  background: '#2E1A16',
+                                  color: '#FAF8F5',
+                                  border: 'none',
+                                  borderRadius: '999px',
+                                  padding: '4px 10px',
+                                  fontSize: '0.7rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                }}
+                                onClick={() => onTrackOrder?.(order)}
+                              >
+                                <Truck size={11} /> Track Order
+                              </button>
+                            </div>
                           </div>
-                          <p className="elora-account-order-desc">
-                            {order.items?.map((it) => `${it.name}${it.quantity > 1 ? ` (x${it.quantity})` : ''}`).join(', ') || 'Botanical Ritual'}
-                          </p>
-                          <span style={{ fontSize: '0.72rem', color: '#776863' }}>
-                            Total: ${order.total?.toFixed(2) || '0.00'} • {order.date || 'Recent'}
-                          </span>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="elora-account-empty-orders">
