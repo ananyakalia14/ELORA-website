@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, Eye, EyeOff, Check, Package, LogOut, ShoppingBag, ShieldCheck, Sliders, Truck, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Check, Package, LogOut, ShoppingBag, ShieldCheck, Sliders, Truck, ArrowRight, X } from 'lucide-react';
 import Header from './Header';
 import Footer from './Footer';
 import { API_BASE_URL } from '../config/api';
@@ -410,6 +410,15 @@ export default function AccountPage({
           {/* Right Side: Floating Sanctuary Portal */}
           <div className="elora-account-form-col">
             <div className="elora-account-portal-card">
+              {/* Close Button for effortless Mobile & Desktop Dismissal */}
+              <button
+                type="button"
+                className="elora-account-floating-close"
+                onClick={onClose}
+                aria-label="Close account view"
+              >
+                <X size={18} />
+              </button>
             
             {/* VIEW 1: SIGN IN */}
             {view === 'signin' && (
@@ -763,27 +772,15 @@ export default function AccountPage({
 
                 {/* Order Summary & History */}
                 <div className="elora-account-dash-card">
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: orders.length > 0 ? '8px' : '4px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div className="elora-account-orders-header">
+                    <div className="elora-account-orders-header-title">
                       <Package size={15} color="#AC7E76" />
-                      <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#3A2E2B', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                        Recent Orders ({orders.length})
-                      </span>
+                      <span>Recent Orders ({orders.length})</span>
                     </div>
 
                     <button
                       type="button"
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#AC7E76',
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                      }}
+                      className="elora-account-tracker-link"
                       onClick={() => onTrackOrder?.(orders[0] || null)}
                     >
                       <Truck size={13} /> Order Tracker →
@@ -797,54 +794,36 @@ export default function AccountPage({
                         const trackNum = order.tracking_number || `EL-TRK-${78290 + (order.id || idx)}`;
                         const isDelivered = (order.status || '').toLowerCase() === 'delivered';
                         const isShipped = (order.status || '').toLowerCase() === 'shipped';
+                        const isCancelled = (order.status || '').toLowerCase() === 'cancelled';
 
                         return (
-                          <div key={order.id || idx} className="elora-account-order-item" style={{ padding: '12px', background: '#FAF8F5', borderRadius: '12px', marginBottom: '8px', border: '1px solid rgba(172, 126, 118, 0.15)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', fontWeight: 600, color: '#2E1A16' }}>
-                              <span>Order #{orderNum}</span>
+                          <div key={order.id || idx} className="elora-account-order-item-card">
+                            <div className="elora-account-order-top-row">
+                              <span className="elora-account-order-number">Order #{orderNum}</span>
                               <span
-                                style={{
-                                  background: isDelivered ? '#E8F5E9' : isShipped ? '#E3F2FD' : '#FBE9E7',
-                                  color: isDelivered ? '#2E7D32' : isShipped ? '#1565C0' : '#D84315',
-                                  padding: '2px 8px',
-                                  borderRadius: '999px',
-                                  fontSize: '0.7rem',
-                                  fontWeight: 600,
-                                  textTransform: 'uppercase',
-                                  letterSpacing: '0.04em',
-                                }}
+                                className={`elora-account-order-badge ${
+                                  isDelivered ? 'is-delivered' : isShipped ? 'is-shipped' : isCancelled ? 'is-cancelled' : 'is-confirmed'
+                                }`}
                               >
                                 {order.status || 'Confirmed'}
                               </span>
                             </div>
 
-                            <p className="elora-account-order-desc" style={{ margin: '6px 0', fontSize: '0.75rem', color: '#5A4A45' }}>
+                            <p className="elora-account-order-desc">
                               {order.items?.map((it) => `${it.name}${it.quantity > 1 ? ` (x${it.quantity})` : ''}`).join(', ') || 'The Élora Botanical Ritual'}
                             </p>
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
-                              <span style={{ fontSize: '0.72rem', color: '#776863' }}>
-                                Total: <strong>${(order.total || 0).toFixed(2)}</strong> • {trackNum}
+                            <div className="elora-account-order-footer-row">
+                              <span className="elora-account-order-total-info">
+                                Total: <strong>${(order.total || 0).toFixed(2)}</strong> • <span className="elora-account-trk-num">{trackNum}</span>
                               </span>
 
                               <button
                                 type="button"
-                                style={{
-                                  background: '#2E1A16',
-                                  color: '#FAF8F5',
-                                  border: 'none',
-                                  borderRadius: '999px',
-                                  padding: '4px 10px',
-                                  fontSize: '0.7rem',
-                                  fontWeight: 600,
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '4px',
-                                }}
+                                className="elora-account-item-track-btn"
                                 onClick={() => onTrackOrder?.(order)}
                               >
-                                <Truck size={11} /> Track Order
+                                <Truck size={12} /> Track Order
                               </button>
                             </div>
                           </div>

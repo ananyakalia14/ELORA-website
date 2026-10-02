@@ -4,7 +4,7 @@ Only accessible to users with role='admin'."""
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import func, select, case, and_
+from sqlalchemy import func, select, case, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_db
@@ -325,7 +325,10 @@ async def admin_list_orders(
     """List all orders with optional status filter."""
     stmt = select(Order).order_by(Order.created_at.desc())
     if status_filter:
-        stmt = stmt.where(Order.status == status_filter)
+        norm_filter = status_filter.strip().lower()
+        if norm_filter in ("dispatch", "dispatched"):
+            norm_filter = "shipped"
+        stmt = stmt.where(Order.status == norm_filter)
     offset = (page - 1) * size
     stmt = stmt.offset(offset).limit(size)
 
@@ -335,24 +338,38 @@ async def admin_list_orders(
     out = []
     for order in orders:
         items_result = await db.execute(
-            select(OrderItem).where(OrderItem.order_id == order.id)
+            select(OrderItem, Product)
+            .outerjoin(Product, OrderItem.product_id == Product.id)
+            .where(OrderItem.order_id == order.id)
         )
-        items = items_result.scalars().all()
+        rows = items_result.all()
+
+        items_out = []
+        for item, prod in rows:
+            prod_name = prod.name if prod else "Élora Botanical Ritual"
+            prod_img = prod.image_url if prod else "/images/elora-hero-serum.jpg"
+            items_out.append(
+                OrderItemOut(
+                    id=item.id,
+                    product_id=item.product_id,
+                    name=prod_name,
+                    quantity=item.quantity,
+                    price=float(item.price),
+                    image=prod_img,
+                )
+            )
+
         out.append(
             OrderOut(
                 id=order.id,
+                order_number=f"EL-{10420 + order.id}",
+                tracking_number=f"EL-TRK-{78290 + order.id}",
+                carrier="Élora White-Glove Atelier Courier",
                 user_id=order.user_id,
                 status=order.status,
                 total=float(order.total),
                 created_at=order.created_at,
-                items=[
-                    OrderItemOut(
-                        product_id=i.product_id,
-                        quantity=i.quantity,
-                        price=float(i.price),
-                    )
-                    for i in items
-                ],
+                items=items_out,
             )
         )
     return out
@@ -365,40 +382,79 @@ async def update_order_status(
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    """Update an order's status."""
+    """Update an order's status and dispatch tracking state."""
+    raw_status = (body.status or "").strip().lower()
+
+    # Normalize common dispatch synonyms
+    status_alias = {
+        "dispatch": "shipped",
+        "dispatched": "shipped",
+        "in_transit": "shipped",
+        "out_for_delivery": "shipped",
+        "complete": "delivered",
+        "completed": "delivered",
+        "cancel": "cancelled",
+        "canceled": "cancelled",
+        "processing": "confirmed",
+        "formulating": "confirmed",
+        "packaged": "confirmed",
+    }
+    final_status = status_alias.get(raw_status, raw_status)
+
     valid_statuses = {"pending", "confirmed", "shipped", "delivered", "cancelled"}
-    if body.status not in valid_statuses:
+    if final_status not in valid_statuses:
         raise HTTPException(
             status_code=400,
             detail=f"Status must be one of: {', '.join(sorted(valid_statuses))}",
         )
 
-    result = await db.execute(select(Order).where(Order.id == order_id))
+    # Allow direct PK lookup or lookup by EL-10420 calculated offset
+    result = await db.execute(
+        select(Order).where(
+            or_(
+                Order.id == order_id,
+                Order.id == (order_id - 10420) if order_id >= 10420 else False,
+            )
+        )
+    )
     order = result.scalar_one_or_none()
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
 
-    order.status = body.status
+    order.status = final_status
     await db.commit()
     await db.refresh(order)
 
     items_result = await db.execute(
-        select(OrderItem).where(OrderItem.order_id == order.id)
+        select(OrderItem, Product)
+        .outerjoin(Product, OrderItem.product_id == Product.id)
+        .where(OrderItem.order_id == order.id)
     )
-    items = items_result.scalars().all()
+    rows = items_result.all()
+
+    items_out = []
+    for item, prod in rows:
+        prod_name = prod.name if prod else "Élora Botanical Ritual"
+        prod_img = prod.image_url if prod else "/images/elora-hero-serum.jpg"
+        items_out.append(
+            OrderItemOut(
+                id=item.id,
+                product_id=item.product_id,
+                name=prod_name,
+                quantity=item.quantity,
+                price=float(item.price),
+                image=prod_img,
+            )
+        )
 
     return OrderOut(
         id=order.id,
+        order_number=f"EL-{10420 + order.id}",
+        tracking_number=f"EL-TRK-{78290 + order.id}",
+        carrier="Élora White-Glove Atelier Courier",
         user_id=order.user_id,
         status=order.status,
         total=float(order.total),
         created_at=order.created_at,
-        items=[
-            OrderItemOut(
-                product_id=i.product_id,
-                quantity=i.quantity,
-                price=float(i.price),
-            )
-            for i in items
-        ],
+        items=items_out,
     )
