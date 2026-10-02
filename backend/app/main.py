@@ -46,16 +46,20 @@ async def lifespan(app: FastAPI):
     except Exception:
         app.state.es = None
 
-    # Auto-seed admin user on startup
+    # Auto-create all tables & auto-seed admin on startup
     try:
-        from app.db import async_session
-        from app.models import User
+        from app.db import async_session, engine
+        from app.models import Base, User, Product
         from sqlalchemy import select, text
         from passlib.context import CryptContext
 
+        # 1. Ensure all database tables exist
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+        # 2. Ensure role column & seed admin
         pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
         async with async_session() as db:
-            # Ensure role column exists
             try:
                 await db.execute(
                     text("ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'customer'")
@@ -74,8 +78,8 @@ async def lifespan(app: FastAPI):
                 )
                 db.add(admin_user)
                 await db.commit()
-    except Exception:
-        pass  # DB may not be ready yet
+    except Exception as e:
+        print(f"[Startup Warning] Database initialization: {e}")
 
     yield
 
@@ -108,7 +112,7 @@ app.add_middleware(
         "http://localhost:8000",
         "http://127.0.0.1:8000",
     ],
-    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
+    allow_origin_regex=r"https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
