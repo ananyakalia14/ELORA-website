@@ -30,6 +30,12 @@ else:
 FRONTEND_DIST = FRONTEND_DIR / "dist"
 FRONTEND_PUBLIC = FRONTEND_DIR / "public"
 
+print(f"[Élora] Frontend dir:    {FRONTEND_DIR}  (exists={FRONTEND_DIR.exists()})")
+print(f"[Élora] Frontend dist:   {FRONTEND_DIST}  (exists={FRONTEND_DIST.exists()})")
+print(f"[Élora] Frontend public: {FRONTEND_PUBLIC}  (exists={FRONTEND_PUBLIC.exists()})")
+print(f"[Élora] index.html:      {FRONTEND_DIST / 'index.html'}  (exists={(FRONTEND_DIST / 'index.html').exists()})")
+
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
