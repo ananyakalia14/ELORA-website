@@ -78,6 +78,7 @@ async def _cart_with_total(redis, user_id: str, db: AsyncSession) -> CartOut:
     return CartOut(items=items, total=round(total, 2))
 
 
+@router.get("", response_model=CartOut, include_in_schema=False)
 @router.get("/", response_model=CartOut)
 async def get_cart(
     request: Request,

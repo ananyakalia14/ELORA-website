@@ -12,6 +12,7 @@ from app.services import search_service
 router = APIRouter(prefix="/products", tags=["products"])
 
 
+@router.get("", response_model=list[ProductOut], include_in_schema=False)
 @router.get("/", response_model=list[ProductOut])
 async def list_products(
     db: AsyncSession = Depends(get_db),

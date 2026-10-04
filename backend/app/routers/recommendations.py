@@ -13,6 +13,7 @@ from app.services import recommendation_service
 router = APIRouter(prefix="/recommendations", tags=["recommendations"])
 
 
+@router.get("", response_model=RecommendationOut, include_in_schema=False)
 @router.get("/", response_model=RecommendationOut)
 async def get_recommendations(
     request: Request,

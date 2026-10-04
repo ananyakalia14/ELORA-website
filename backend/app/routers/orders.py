@@ -143,6 +143,7 @@ async def _resolve_user_from_request(
 
 
 @router.post("/checkout", response_model=OrderOut, status_code=status.HTTP_201_CREATED)
+@router.post("/checkout/", response_model=OrderOut, status_code=status.HTTP_201_CREATED, include_in_schema=False)
 async def checkout(
     body: CheckoutRequest,
     request: Request,
@@ -320,6 +321,7 @@ async def checkout(
 
 
 @router.get("/orders", response_model=list[OrderOut])
+@router.get("/orders/", response_model=list[OrderOut], include_in_schema=False)
 async def order_history(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

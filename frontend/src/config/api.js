@@ -1,8 +1,20 @@
 /**
  * Central API configuration for Élora.
- * Automatically switches between local dev (http://127.0.0.1:8000)
- * and production cloud backend (via VITE_API_BASE_URL set in Vercel).
+ * In development, uses empty string so requests go through the Vite proxy (avoids CORS).
+ * In production, uses the VITE_API_BASE_URL or VITE_API_URL env variable,
+ * or falls back to the Railway backend deployment URL.
  */
-export const API_BASE_URL =
-  (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL)) ||
-  'http://127.0.0.1:8000';
+const isDev = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV;
+
+const envUrl =
+  (typeof import.meta !== 'undefined' &&
+    import.meta.env &&
+    (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL)) ||
+  '';
+
+const defaultProdUrl = 'https://elora-website-production.up.railway.app';
+
+export const API_BASE_URL = isDev
+  ? ''
+  : (envUrl ? envUrl.replace(/\/+$/, '') : defaultProdUrl);
+

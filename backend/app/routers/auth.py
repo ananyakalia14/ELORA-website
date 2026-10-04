@@ -47,17 +47,26 @@ async def get_current_user(
     return user
 
 
+@router.get("/register", include_in_schema=False)
+async def register_get_info():
+    return {
+        "message": "The Élora registration endpoint requires an HTTP POST request with JSON payload: { 'name': '...', 'email': '...', 'password': '...' }",
+        "interactive_docs": "/docs#/auth/register_auth_register_post",
+    }
+
+
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+@router.post("/register/", response_model=UserOut, status_code=status.HTTP_201_CREATED, include_in_schema=False)
 async def register(body: UserRegister, db: AsyncSession = Depends(get_db)):
     # Check existing
-    existing = await db.execute(select(User).where(User.email == body.email))
+    existing = await db.execute(select(User).where(User.email == body.email.strip().lower()))
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Email already registered")
 
     user = User(
-        email=body.email,
+        email=body.email.strip().lower(),
         password_hash=pwd_ctx.hash(body.password),
-        name=body.name,
+        name=body.name.strip(),
         skin_type=body.skin_type,
     )
     db.add(user)
@@ -67,6 +76,7 @@ async def register(body: UserRegister, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
+@router.post("/login/", response_model=Token, include_in_schema=False)
 async def login(
     request: Request,
     db: AsyncSession = Depends(get_db)
@@ -96,5 +106,6 @@ async def login(
 
 
 @router.get("/me", response_model=UserOut)
+@router.get("/me/", response_model=UserOut, include_in_schema=False)
 async def me(user: User = Depends(get_current_user)):
     return user

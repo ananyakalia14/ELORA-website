@@ -29,6 +29,30 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 60
 
+    # CORS
+    cors_origins: str = Field(
+        default="https://elora-sigma-seven.vercel.app,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000",
+        validation_alias="CORS_ORIGINS",
+    )
+
+    @property
+    def allowed_cors_origins(self) -> list[str]:
+        defaults = [
+            "https://elora-sigma-seven.vercel.app",
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:8000",
+            "http://127.0.0.1:8000",
+        ]
+        if self.cors_origins:
+            for item in self.cors_origins.split(","):
+                clean = item.strip().rstrip("/")
+                if clean and clean not in defaults:
+                    defaults.append(clean)
+        return defaults
+
     @property
     def database_url(self) -> str:
         if self.database_url_raw:
