@@ -278,14 +278,7 @@ export default function Footer({ onNavigate, variant }) {
                   </a>
                 </div>
 
-                <div className="pt-1 space-y-2">
-                  <a
-                    href="#admin"
-                    onClick={(e) => handleLinkClick(e, '#admin')}
-                    className="elora-link text-[11px] text-[#3A2E2B]/60 hover:text-[#3A2E2B] font-light block transition-colors"
-                  >
-                    Atelier Portal ✦
-                  </a>
+                <div className="pt-1">
                   <a
                     href="#cookie-preferences"
                     className="elora-link text-[11px] text-[#3A2E2B]/70 hover:text-[#3A2E2B] font-light block transition-colors"

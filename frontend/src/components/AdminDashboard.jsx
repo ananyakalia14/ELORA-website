@@ -147,23 +147,64 @@ export default function AdminDashboard({ isOpen, onClose, onOpenStore }) {
   };
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/admin/orders/${orderId}`, {
+    let token = adminToken || localStorage.getItem('elora_token');
+    setError('');
+
+    // Helper to send the PUT request
+    const sendUpdate = async (authToken) => {
+      return fetch(`${API_BASE_URL}/admin/orders/${orderId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${adminToken}`
+          Authorization: `Bearer ${authToken}`
         },
         body: JSON.stringify({ status: newStatus })
       });
+    };
+
+    try {
+      let res = await sendUpdate(token);
+
+      // If unauthorized, re-authenticate as admin seamlessly and retry
+      if (res.status === 401 || res.status === 403) {
+        const loginRes = await fetch(`${API_BASE_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: adminEmail, password: adminPassword })
+        });
+        if (loginRes.ok) {
+          const authData = await loginRes.json();
+          token = authData.access_token;
+          localStorage.setItem('elora_token', token);
+          setAdminToken(token);
+          setIsAdminAuthenticated(true);
+          res = await sendUpdate(token);
+        }
+      }
 
       if (res.ok) {
-        setSuccessMsg(`Order #${orderId} status updated to ${newStatus}`);
-        setTimeout(() => setSuccessMsg(''), 3000);
-        loadDashboardData(adminToken);
+        setSuccessMsg(`Order #${orderId} dispatch status updated to "${newStatus.toUpperCase()}"`);
+        setTimeout(() => setSuccessMsg(''), 4000);
+
+        // Also sync local storage orders if stored locally
+        try {
+          const localOrders = JSON.parse(localStorage.getItem('elora_orders') || '[]');
+          const updatedLocal = localOrders.map((o) => {
+            if (o.id === orderId || o.order_number === `EL-${orderId}` || o.id === (orderId - 10420)) {
+              return { ...o, status: newStatus };
+            }
+            return o;
+          });
+          localStorage.setItem('elora_orders', JSON.stringify(updatedLocal));
+        } catch {}
+
+        loadDashboardData(token);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setError(errData.detail || `Failed to update status for order #${orderId}`);
       }
-    } catch {
-      setError('Could not update order status');
+    } catch (err) {
+      setError('Could not update order status: ' + (err.message || 'network error'));
     }
   };
 
@@ -450,14 +491,14 @@ export default function AdminDashboard({ isOpen, onClose, onOpenStore }) {
                           </td>
                           <td>
                             <select
-                              value={o.status}
+                              value={o.status?.toLowerCase() || 'confirmed'}
                               onChange={(e) => handleUpdateOrderStatus(o.id, e.target.value)}
                               className="elora-status-select"
                             >
                               <option value="pending">Pending</option>
                               <option value="confirmed">Confirmed</option>
-                              <option value="shipped">Shipped</option>
-                              <option value="delivered">Delivered</option>
+                              <option value="shipped">Shipped (Dispatched) 🚚</option>
+                              <option value="delivered">Delivered ✨</option>
                               <option value="cancelled">Cancelled</option>
                             </select>
                           </td>

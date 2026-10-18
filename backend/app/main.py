@@ -30,6 +30,12 @@ else:
 FRONTEND_DIST = FRONTEND_DIR / "dist"
 FRONTEND_PUBLIC = FRONTEND_DIR / "public"
 
+print(f"[Élora] Frontend dir:    {FRONTEND_DIR}  (exists={FRONTEND_DIR.exists()})")
+print(f"[Élora] Frontend dist:   {FRONTEND_DIST}  (exists={FRONTEND_DIST.exists()})")
+print(f"[Élora] Frontend public: {FRONTEND_PUBLIC}  (exists={FRONTEND_PUBLIC.exists()})")
+print(f"[Élora] index.html:      {FRONTEND_DIST / 'index.html'}  (exists={(FRONTEND_DIST / 'index.html').exists()})")
+
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -46,16 +52,20 @@ async def lifespan(app: FastAPI):
     except Exception:
         app.state.es = None
 
-    # Auto-seed admin user on startup
+    # Auto-create all tables & auto-seed admin on startup
     try:
-        from app.db import async_session
-        from app.models import User
+        from app.db import async_session, engine
+        from app.models import Base, User, Product
         from sqlalchemy import select, text
         from passlib.context import CryptContext
 
+        # 1. Ensure all database tables exist
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+        # 2. Ensure role column & seed admin
         pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
         async with async_session() as db:
-            # Ensure role column exists
             try:
                 await db.execute(
                     text("ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'customer'")
@@ -74,8 +84,8 @@ async def lifespan(app: FastAPI):
                 )
                 db.add(admin_user)
                 await db.commit()
-    except Exception:
-        pass  # DB may not be ready yet
+    except Exception as e:
+        print(f"[Startup Warning] Database initialization: {e}")
 
     yield
 
@@ -100,8 +110,15 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_cors_origins,
-    allow_origin_regex=r"^https?://([a-zA-Z0-9_-]+\.)*(vercel\.app|railway\.app|localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_origins=list(set(settings.allowed_cors_origins + [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ])),
+    allow_origin_regex=r"^https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -161,7 +178,30 @@ async def root():
     if index_file.exists():
         return FileResponse(index_file)
     return {
-        "message": "Élora Omnimart API is running. Frontend draft has not been built to dist yet.",
+        "message": "Élora Omnimart API is running.",
+        "docs_url": "/docs",
+        "health_url": "/health",
+    }
+
+
+@app.get("/{full_path:path}", include_in_schema=False)
+async def catch_all(full_path: str):
+    # 1. If physical static file exists in dist or public, serve it
+    dist_file = FRONTEND_DIST / full_path
+    if dist_file.is_file():
+        return FileResponse(dist_file)
+
+    public_file = FRONTEND_PUBLIC / full_path
+    if public_file.is_file():
+        return FileResponse(public_file)
+
+    # 2. Otherwise serve frontend index.html for client-side routing
+    index_file = FRONTEND_DIST / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+
+    return {
+        "message": f"Resource /{full_path} not found.",
         "docs_url": "/docs",
         "health_url": "/health",
     }

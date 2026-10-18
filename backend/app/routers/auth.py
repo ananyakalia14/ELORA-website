@@ -58,21 +58,32 @@ async def register_get_info():
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 @router.post("/register/", response_model=UserOut, status_code=status.HTTP_201_CREATED, include_in_schema=False)
 async def register(body: UserRegister, db: AsyncSession = Depends(get_db)):
-    # Check existing
-    existing = await db.execute(select(User).where(User.email == body.email.strip().lower()))
-    if existing.scalar_one_or_none():
-        raise HTTPException(status_code=400, detail="Email already registered")
+    clean_email = body.email.strip().lower()
+    clean_name = body.name.strip()
 
-    user = User(
-        email=body.email.strip().lower(),
-        password_hash=pwd_ctx.hash(body.password),
-        name=body.name.strip(),
-        skin_type=body.skin_type,
-    )
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
-    return user
+    if not clean_email or "@" not in clean_email:
+        raise HTTPException(status_code=400, detail="Please provide a valid email address.")
+
+    # Check existing email (case-insensitive)
+    existing = await db.execute(select(User).where(User.email.ilike(clean_email)))
+    if existing.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="This email is already registered. Please sign in instead.")
+
+    try:
+        user = User(
+            email=clean_email,
+            password_hash=pwd_ctx.hash(body.password),
+            name=clean_name,
+            skin_type=body.skin_type,
+            role="customer",
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+        return user
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database registration error: {str(e)}")
 
 
 @router.post("/login", response_model=Token)
