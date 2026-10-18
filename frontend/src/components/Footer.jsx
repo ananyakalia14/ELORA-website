@@ -238,7 +238,6 @@ export default function Footer({ onNavigate, variant }) {
                 { label: 'Accessibility Statement', href: '#accessibility' },
                 { label: 'FAQ', href: '#faq' },
                 { label: 'Contact', href: '#contact' },
-                { label: 'Atelier Admin', href: '#admin' },
               ].map((link, idx) => (
                 <li key={idx}>
                   <a
